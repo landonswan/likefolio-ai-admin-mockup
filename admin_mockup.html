@@ -1,0 +1,3069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LikeFolio.ai Admin - Matias Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            background: #1a1a1a;
+            border-right: 1px solid #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #4a9eff;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #b0b0b0;
+        }
+
+        .nav-item:hover {
+            background: #2a2a2a;
+            color: #e0e0e0;
+        }
+
+        .nav-item.active {
+            background: #2a4a7c;
+            color: #fff;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        /* Controls Bar */
+        .controls-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 40px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            font-size: 20px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .search-clear:hover {
+            color: #e0e0e0;
+        }
+
+        .search-clear.show {
+            display: block;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            padding: 10px 16px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .filter-btn:hover {
+            background: #2a2a2a;
+            border-color: #4a9eff;
+        }
+
+        .filter-btn.active {
+            background: #2a4a7c;
+            border-color: #4a9eff;
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background: #4a9eff;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #3a8eef;
+        }
+
+        .btn-secondary {
+            padding: 10px 20px;
+            background: #2a2a2a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #e0e0e0;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #3a3a3a;
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 50px 120px 250px 180px 1fr 220px 230px;
+            background: #252525;
+            padding: 16px 20px;
+            font-weight: 600;
+            border-bottom: 1px solid #333;
+        }
+
+        .table-header div {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sortable:hover {
+            color: #4a9eff;
+        }
+
+        .sort-icon {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .sort-icon.active {
+            color: #4a9eff;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 50px 120px 250px 180px 1fr 220px 230px;
+            padding: 16px 20px;
+            border-bottom: 1px solid #2a2a2a;
+            transition: all 0.2s;
+            align-items: center;
+        }
+
+        .table-row:hover {
+            background: #222;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .ticker {
+            font-weight: 600;
+            color: #4a9eff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .ticker:hover {
+            color: #3a8eef;
+        }
+
+        .company-name {
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        /* Grade Pills */
+        .grade-selector {
+            display: flex;
+            gap: 6px;
+        }
+
+        .grade-pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 600;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .grade-pill:hover {
+            transform: scale(1.1);
+        }
+
+        .grade-pill.active {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .grade-A { background: #22c55e; color: #000; }
+        .grade-B { background: #84cc16; color: #000; }
+        .grade-C { background: #eab308; color: #000; }
+        .grade-D { background: #f97316; color: #000; }
+        .grade-F { background: #ef4444; color: #fff; }
+
+        /* Status Column */
+        .status-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .status-complete {
+            color: #22c55e;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .status-transitioning {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2a2a2a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 2px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a9eff, #3a8eef);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .last-updated {
+            color: #888;
+            font-size: 13px;
+        }
+
+        /* Bulk Actions Bar */
+        .bulk-actions {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2a2a2a;
+            border: 1px solid #4a9eff;
+            border-radius: 12px;
+            padding: 16px 24px;
+            display: none;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        .bulk-actions.show {
+            display: flex;
+        }
+
+        .bulk-info {
+            color: #4a9eff;
+            font-weight: 500;
+        }
+
+        .bulk-actions .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Theme Management Styles */
+        .theme-table {
+            width: 100%;
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .theme-table-header {
+            display: grid;
+            grid-template-columns: 250px 1fr 120px 120px 200px 150px 120px;
+            background: #252525;
+            padding: 16px 20px;
+            font-weight: 600;
+            border-bottom: 1px solid #333;
+        }
+
+        .theme-table-row {
+            display: grid;
+            grid-template-columns: 250px 1fr 120px 120px 200px 150px 120px;
+            padding: 16px 20px;
+            border-bottom: 1px solid #2a2a2a;
+            transition: all 0.2s;
+            align-items: center;
+        }
+
+        .theme-table-row:hover {
+            background: #222;
+        }
+
+        .theme-name-cell {
+            font-weight: 600;
+            color: #4a9eff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .theme-name-cell:hover {
+            color: #3a8eef;
+        }
+
+        .theme-description-cell {
+            color: #b0b0b0;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .theme-strength {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .strength-plus-2 { background: #22c55e; color: #000; }
+        .strength-plus-1 { background: #84cc16; color: #000; }
+        .strength-0 { background: #6b7280; color: #fff; }
+        .strength-minus-1 { background: #f97316; color: #000; }
+        .strength-minus-2 { background: #ef4444; color: #fff; }
+
+        .company-count-cell {
+            color: #4a9eff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .company-count-cell:hover {
+            color: #3a8eef;
+        }
+
+        .theme-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: #2a2a2a;
+            border: 1px solid #333;
+            color: #e0e0e0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: #3a3a3a;
+            border-color: #4a9eff;
+        }
+
+        /* Expanded companies in theme row */
+        .expanded-companies {
+            grid-column: 1 / -1;
+            padding: 20px;
+            background: #0f0f0f;
+            border-top: 1px solid #333;
+            position: relative;
+            z-index: 1;
+        }
+
+        .expanded-companies-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        /* Company rows in expanded theme */
+        .company-row-table {
+            width: 100%;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: visible; /* Allow dropdown to overflow */
+            border: 1px solid #333;
+            min-height: 400px; /* Ensure enough height for dropdown */
+        }
+
+        .company-row-header {
+            display: grid;
+            grid-template-columns: 50px 120px 250px 150px 180px 100px;
+            background: #252525;
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 13px;
+            border-bottom: 1px solid #333;
+        }
+
+        .company-row {
+            display: grid;
+            grid-template-columns: 50px 120px 250px 150px 180px 100px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #2a2a2a;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        /* Expanded theme company rows need different grid */
+        .expanded-companies .company-row-header {
+            grid-template-columns: 50px 120px 250px 150px 200px 100px;
+        }
+
+        .expanded-companies .company-row {
+            grid-template-columns: 50px 120px 250px 150px 200px 100px;
+        }
+
+        .company-row:hover {
+            background: #222;
+        }
+
+        .chip-relationship {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .relationship-strong {
+            background: #22c55e;
+            color: #000;
+        }
+
+        .relationship-weak {
+            background: #6b7280;
+            color: #fff;
+        }
+
+        .remove-btn {
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .remove-btn:hover {
+            color: #dc2626;
+        }
+
+        /* Association Management Styles */
+        .association-table {
+            width: 100%;
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .association-table-header {
+            display: grid;
+            grid-template-columns: 120px 250px 250px 120px 200px 150px 100px;
+            background: #252525;
+            padding: 16px 20px;
+            font-weight: 600;
+            border-bottom: 1px solid #333;
+        }
+
+        .association-table-row {
+            display: grid;
+            grid-template-columns: 120px 250px 250px 120px 200px 150px 100px;
+            padding: 16px 20px;
+            border-bottom: 1px solid #2a2a2a;
+            transition: all 0.2s;
+            align-items: center;
+        }
+
+        .association-table-row:hover {
+            background: #222;
+        }
+
+        .view-link {
+            color: #4a9eff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .view-link:hover {
+            color: #3a8eef;
+        }
+
+        .relationship-toggle {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .relationship-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
+            font-size: 22px;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            color: #888;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0f0f0f;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .strength-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .strength-option {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .strength-option:hover {
+            transform: scale(1.05);
+        }
+
+        .strength-option.selected {
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        /* Company selector in theme modal */
+        .company-selector {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px;
+            background: #0f0f0f;
+        }
+
+        .company-selector-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .company-selector-item:hover {
+            background: #1a1a1a;
+        }
+
+        .company-selector-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        /* Add ticker row */
+        .add-ticker-row {
+            display: grid;
+            grid-template-columns: 50px 120px 250px 150px 100px;
+            padding: 12px 16px;
+            background: #0f0f0f;
+            border-top: 2px solid #4a9eff;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .add-ticker-input {
+            padding: 8px 12px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .add-ticker-input:focus {
+            outline: none;
+            border-color: #4a9eff;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            background: #1a1a1a;
+            border: 1px solid #4a9eff;
+            border-radius: 6px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 10000;
+            width: 250px;
+            margin-top: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+
+        .autocomplete-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .autocomplete-item:hover {
+            background: #2a2a2a;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .relationship-select-small {
+            padding: 6px 10px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .relationship-select-small:focus {
+            outline: none;
+            border-color: #4a9eff;
+        }
+
+        /* Stats Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: #4a9eff;
+        }
+
+        /* Detail View Page */
+        .detail-view {
+            max-width: 1200px;
+        }
+
+        .detail-header {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .detail-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .detail-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .detail-section h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #4a9eff;
+        }
+
+        .back-link {
+            color: #4a9eff;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .back-link:hover {
+            color: #3a8eef;
+        }
+
+        /* Scrollbar Styles */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+            <div class="logo">LikeFolio.ai</div>
+            <div class="nav-item active" data-view="abcdf">Swan Grades</div>
+            <div class="nav-item" data-view="themes">Theme Management</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1 id="page-title">Swan Grade Management</h1>
+                <div style="color: #888; font-size: 14px;">Admin Tools for Matias</div>
+            </div>
+
+            <div class="content-area">
+                <!-- Swan Grade Management View -->
+                <div id="abcdf-view" class="view-content">
+                    <div class="stats-row" id="abcdf-stats">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Companies</div>
+                            <div class="stat-value">500</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Grade A</div>
+                            <div class="stat-value" id="grade-a-count">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Grade B</div>
+                            <div class="stat-value" id="grade-b-count">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Grade C</div>
+                            <div class="stat-value" id="grade-c-count">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Grade D</div>
+                            <div class="stat-value" id="grade-d-count">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Grade F</div>
+                            <div class="stat-value" id="grade-f-count">0</div>
+                        </div>
+                    </div>
+
+                    <div class="controls-bar">
+                        <div class="search-box">
+                            <input type="text" placeholder="Search by ticker or company name..." id="search-input">
+                            <span class="search-clear" id="grade-search-clear" onclick="clearGradeSearch()">×</span>
+                        </div>
+                        <div class="filter-group">
+                            <div class="filter-btn active" data-filter="all">All</div>
+                            <div class="filter-btn" data-filter="A">A</div>
+                            <div class="filter-btn" data-filter="B">B</div>
+                            <div class="filter-btn" data-filter="C">C</div>
+                            <div class="filter-btn" data-filter="D">D</div>
+                            <div class="filter-btn" data-filter="F">F</div>
+                        </div>
+                        <button class="btn-primary" onclick="exportData()">Export CSV</button>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="table-header">
+                            <div><input type="checkbox" class="checkbox" id="select-all"></div>
+                            <div>Ticker</div>
+                            <div>Company</div>
+                            <div>Sector</div>
+                            <div>Grade</div>
+                            <div>Status</div>
+                            <div class="sortable" onclick="sortByLastUpdated()">
+                                Last Updated
+                                <span class="sort-icon" id="sort-icon">▼</span>
+                            </div>
+                        </div>
+                        <div id="table-body">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme Management View -->
+                <div id="themes-view" class="view-content hidden">
+                    <div class="stats-row" id="theme-stats">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Themes</div>
+                            <div class="stat-value">40</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Strength +2</div>
+                            <div class="stat-value" id="strength-plus-2-count">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Strength +1</div>
+                            <div class="stat-value" id="strength-plus-1-count">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Strength 0</div>
+                            <div class="stat-value" id="strength-0-count">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Strength -1</div>
+                            <div class="stat-value" id="strength-minus-1-count">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Strength -2</div>
+                            <div class="stat-value" id="strength-minus-2-count">0</div>
+                        </div>
+                    </div>
+
+                    <div class="controls-bar">
+                        <div class="search-box">
+                            <input type="text" placeholder="Search themes..." id="theme-search">
+                            <span class="search-clear" id="theme-search-clear" onclick="clearThemeSearch()">×</span>
+                        </div>
+                        <div class="filter-group">
+                            <div class="filter-btn active" data-theme-filter="all">All</div>
+                            <div class="filter-btn" data-theme-filter="2">+2</div>
+                            <div class="filter-btn" data-theme-filter="1">+1</div>
+                            <div class="filter-btn" data-theme-filter="0">0</div>
+                            <div class="filter-btn" data-theme-filter="-1">-1</div>
+                            <div class="filter-btn" data-theme-filter="-2">-2</div>
+                        </div>
+                        <button class="btn-primary" onclick="openThemeModal()">+ New Theme</button>
+                    </div>
+
+                    <div class="theme-table">
+                        <div class="theme-table-header">
+                            <div>Theme Name</div>
+                            <div>Description</div>
+                            <div>Strength</div>
+                            <div>Companies</div>
+                            <div>Status</div>
+                            <div class="sortable" onclick="sortThemesByLastEdit()">
+                                Last Edited
+                                <span class="sort-icon" id="theme-sort-icon">▼</span>
+                            </div>
+                            <div>Actions</div>
+                        </div>
+                        <div id="theme-table-body">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Company Detail View -->
+                <div id="company-detail-view" class="view-content hidden detail-view">
+                    <div class="back-link" onclick="showView('abcdf')">← Back to Swan Grades</div>
+                    <div class="detail-header">
+                        <div class="detail-title" id="company-detail-title">AAPL - Apple Inc.</div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>Swan Grade</h3>
+                        <div id="company-detail-grade" style="margin-top: 12px;">
+                            <!-- Grade selector will be inserted here -->
+                        </div>
+                        <div id="company-detail-status" style="margin-top: 16px;">
+                            <!-- Status will be inserted here -->
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3>Associated Themes (<span id="company-theme-count">0</span>)</h3>
+                        <div id="company-detail-themes">
+                            <!-- Themes will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme Detail View -->
+                <div id="theme-detail-view" class="view-content hidden detail-view">
+                    <div class="back-link" onclick="showView('themes')">← Back to Theme Management</div>
+                    <div class="detail-header">
+                        <div class="detail-title" id="theme-detail-title">AI & Machine Learning</div>
+                        <div style="margin-top: 12px; display: flex; gap: 20px; align-items: center;">
+                            <div>
+                                <span style="color: #888;">Strength: </span>
+                                <span id="theme-detail-strength"></span>
+                            </div>
+                        </div>
+                        <div id="theme-detail-status" style="margin-top: 16px;">
+                            <!-- Status will be inserted here -->
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>Description</h3>
+                        <textarea id="theme-detail-description" style="color: #b0b0b0; line-height: 1.6; width: 100%; padding: 12px; background: #0f0f0f; border: 1px solid #333; border-radius: 8px; min-height: 100px; font-family: inherit; font-size: 14px;"></textarea>
+                        <button id="theme-desc-save-btn" class="btn-primary" style="margin-top: 12px; display: none;" onclick="saveThemeDescription()">Save Description</button>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3>Associated Companies (<span id="theme-detail-company-count">0</span>)</h3>
+                        <div id="theme-detail-companies">
+                            <!-- Companies will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Actions Bar -->
+    <div class="bulk-actions" id="bulk-actions">
+        <div class="bulk-info"><span id="selected-count">0</span> companies selected</div>
+        <div class="btn-group">
+            <button class="btn-secondary" onclick="bulkSetGrade('A')">Set Grade A</button>
+            <button class="btn-secondary" onclick="bulkSetGrade('B')">Set Grade B</button>
+            <button class="btn-secondary" onclick="bulkSetGrade('C')">Set Grade C</button>
+            <button class="btn-secondary" onclick="bulkSetGrade('D')">Set Grade D</button>
+            <button class="btn-secondary" onclick="bulkSetGrade('F')">Set Grade F</button>
+        </div>
+        <button class="btn-secondary" onclick="clearSelection()">Clear</button>
+    </div>
+
+    <!-- Theme Modal -->
+    <div class="modal" id="theme-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="theme-modal-title">Create New Theme</h2>
+                <span class="close-btn" onclick="closeThemeModal()">&times;</span>
+            </div>
+            <form>
+                <div class="form-group">
+                    <label>Theme Name</label>
+                    <input type="text" placeholder="e.g., AI & Machine Learning" id="theme-name-input">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea placeholder="Describe the theme and its impact..." id="theme-desc-input"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Strength</label>
+                    <div class="strength-selector">
+                        <div class="strength-option strength-plus-2" data-strength="2">
+                            <div>+2</div>
+                            <div style="font-size: 11px; margin-top: 4px;">Very Positive</div>
+                        </div>
+                        <div class="strength-option strength-plus-1" data-strength="1">
+                            <div>+1</div>
+                            <div style="font-size: 11px; margin-top: 4px;">Positive</div>
+                        </div>
+                        <div class="strength-option strength-0 selected" data-strength="0">
+                            <div>0</div>
+                            <div style="font-size: 11px; margin-top: 4px;">Neutral</div>
+                        </div>
+                        <div class="strength-option strength-minus-1" data-strength="-1">
+                            <div>-1</div>
+                            <div style="font-size: 11px; margin-top: 4px;">Negative</div>
+                        </div>
+                        <div class="strength-option strength-minus-2" data-strength="-2">
+                            <div>-2</div>
+                            <div style="font-size: 11px; margin-top: 4px;">Very Negative</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Add Companies to Theme</label>
+                    <div class="search-box" style="margin-bottom: 10px;">
+                        <input type="text" placeholder="Search companies..." id="theme-company-search">
+                    </div>
+                    <div class="company-selector" id="theme-company-selector">
+                        <!-- Company checkboxes will be populated here -->
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeThemeModal()">Cancel</button>
+                    <button type="button" class="btn-primary" onclick="saveTheme()">Create Theme</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ========== DATA GENERATION ==========
+        
+        const tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'TSLA', 'META', 'NVDA', 'JPM', 'V', 'WMT', 
+            'JNJ', 'PG', 'MA', 'HD', 'DIS', 'PYPL', 'NFLX', 'ADBE', 'CRM', 'INTC',
+            'CSCO', 'PFE', 'NKE', 'MRK', 'ABT', 'TMO', 'COST', 'AVGO', 'ACN', 'TXN',
+            'DHR', 'NEE', 'LIN', 'UNP', 'BMY', 'PM', 'MDT', 'QCOM', 'HON', 'UPS',
+            'LOW', 'BA', 'SBUX', 'AMT', 'INTU', 'RTX', 'AMAT', 'CVS', 'GE', 'IBM'];
+        
+        const companyNames = ['Apple Inc.', 'Microsoft Corp.', 'Alphabet Inc.', 'Amazon.com Inc.', 'Tesla Inc.',
+            'Meta Platforms', 'NVIDIA Corp.', 'JPMorgan Chase', 'Visa Inc.', 'Walmart Inc.',
+            'Johnson & Johnson', 'Procter & Gamble', 'Mastercard Inc.', 'Home Depot', 'Walt Disney Co.',
+            'PayPal Holdings', 'Netflix Inc.', 'Adobe Inc.', 'Salesforce Inc.', 'Intel Corp.',
+            'Cisco Systems', 'Pfizer Inc.', 'Nike Inc.', 'Merck & Co.', 'Abbott Labs',
+            'Thermo Fisher', 'Costco Wholesale', 'Broadcom Inc.', 'Accenture PLC', 'Texas Instruments',
+            'Danaher Corp.', 'NextEra Energy', 'Linde PLC', 'Union Pacific', 'Bristol Myers',
+            'Philip Morris', 'Medtronic PLC', 'Qualcomm Inc.', 'Honeywell Intl', 'United Parcel',
+            'Lowe\'s Companies', 'Boeing Co.', 'Starbucks Corp.', 'American Tower', 'Intuit Inc.',
+            'Raytheon Tech', 'Applied Materials', 'CVS Health', 'General Electric', 'IBM Corp.'];
+        
+        const sectors = ['Technology', 'Healthcare', 'Financial', 'Consumer', 'Industrial', 
+            'Energy', 'Materials', 'Utilities', 'Real Estate', 'Communication',
+            'E-Commerce', 'Automotive', 'Retail', 'Pharmaceuticals', 'Semiconductors',
+            'Software', 'Hardware', 'Apparel', 'Restaurants', 'Entertainment'];
+        
+        const grades = ['A', 'B', 'C', 'D', 'F'];
+        
+        const themeNames = [
+            'AI & Machine Learning', 'High-End Retail', 'Supply Chain Issues', 'Remote Work Shift',
+            'Rising Interest Rates', 'Green Energy Transition', 'Cybersecurity Demand', 'Healthcare Innovation',
+            'E-Commerce Growth', 'Inflation Pressures', 'Cloud Computing', 'Electric Vehicles',
+            'Social Media Fatigue', '5G Rollout', 'Streaming Wars', 'Chip Shortage',
+            'Labor Market Tightness', 'Consumer Debt Levels', 'Regulatory Scrutiny', 'Global Trade Tensions',
+            'Subscription Economy', 'Direct-to-Consumer', 'Autonomous Vehicles', 'Metaverse Development',
+            'Quantum Computing', 'Biotech Breakthroughs', 'Space Economy', 'Fintech Disruption',
+            'Gig Economy Growth', 'Data Privacy Concerns', 'Renewable Energy', 'Luxury Spending',
+            'Fast Fashion Decline', 'Work-from-Home Tech', 'Gaming Industry Boom', 'Mental Health Focus',
+            'Sustainable Investing', 'Cryptocurrency Adoption', 'Robotics & Automation', 'Aging Population'
+        ];
+        
+        const themeDescriptions = [
+            'Companies heavily invested in artificial intelligence and machine learning technologies',
+            'Luxury and premium retail brands benefiting from strong consumer spending',
+            'Companies experiencing significant supply chain disruptions',
+            'Businesses impacted by the shift to remote/hybrid work models',
+            'Companies heavily impacted by rising interest rates and high-debt exposure',
+            'Firms leading the transition to renewable and sustainable energy',
+            'Organizations benefiting from increased cybersecurity spending',
+            'Healthcare companies driving innovation in treatments and diagnostics',
+            'Retailers and platforms capitalizing on online shopping growth',
+            'Companies struggling with input cost inflation and pricing power',
+            'Cloud infrastructure and SaaS providers with strong growth',
+            'Automotive and energy companies in the EV ecosystem',
+            'Social platforms facing user engagement and ad revenue challenges',
+            'Telecom and tech companies deploying 5G networks',
+            'Media companies competing in the streaming content space',
+            'Tech manufacturers affected by semiconductor supply constraints',
+            'Businesses facing wage pressure and talent retention issues',
+            'Consumer-facing companies impacted by high household debt',
+            'Companies under increased government and regulatory oversight',
+            'Businesses exposed to tariffs and international trade policy',
+            'Companies with recurring revenue subscription models',
+            'Brands selling directly to consumers, bypassing traditional retail',
+            'Firms developing self-driving vehicle technology',
+            'Companies investing in virtual worlds and immersive experiences',
+            'Early-stage quantum computing research and development',
+            'Biotech firms with breakthrough drug pipelines',
+            'Commercial space exploration and satellite companies',
+            'Financial technology disruptors challenging traditional banking',
+            'Platforms enabling freelance and contract work',
+            'Companies facing scrutiny over data collection practices',
+            'Solar, wind, and alternative energy producers',
+            'High-end brands benefiting from wealthy consumer spending',
+            'Fast fashion retailers facing sustainability backlash',
+            'Software and hardware enabling remote work',
+            'Video game publishers and esports platforms',
+            'Companies addressing mental health and wellness',
+            'ESG-focused investment and sustainable business practices',
+            'Businesses adopting or enabling crypto transactions',
+            'Automation technology reducing labor costs',
+            'Healthcare and consumer companies serving older demographics'
+        ];
+
+        // Generate 500 companies with grade transition data
+        let companies = [];
+        for (let i = 0; i < 500; i++) {
+            const ticker = i < tickers.length ? tickers[i] : `TICK${i}`;
+            const companyName = i < companyNames.length ? companyNames[i] : `Company ${i}`;
+            const sector = sectors[Math.floor(Math.random() * sectors.length)];
+            const grade = grades[Math.floor(Math.random() * grades.length)];
+            const daysAgo = Math.floor(Math.random() * 90);
+            
+            // Generate grade transition data
+            const weeksInCurrentGrade = Math.floor(Math.random() * 16); // 0-15 weeks
+            let targetGrade = null;
+            let transitionProgress = 0;
+            let etaDate = null;
+            let stableSinceDate = null;
+            
+            if (weeksInCurrentGrade < 10) {
+                // Still transitioning
+                const possibleTargets = grades.filter(g => g !== grade);
+                targetGrade = possibleTargets[Math.floor(Math.random() * possibleTargets.length)];
+                transitionProgress = (weeksInCurrentGrade / 10) * 100;
+                
+                // Calculate ETA (10 weeks from start, minus weeks already passed)
+                const weeksRemaining = 10 - weeksInCurrentGrade;
+                const eta = new Date();
+                eta.setDate(eta.getDate() + (weeksRemaining * 7));
+                etaDate = eta;
+            } else {
+                // Stable - set "since" date
+                const daysStable = Math.floor(Math.random() * 180); // 0-180 days stable
+                stableSinceDate = new Date();
+                stableSinceDate.setDate(stableSinceDate.getDate() - daysStable);
+            }
+            
+            companies.push({
+                ticker,
+                name: companyName,
+                sector,
+                grade,
+                lastUpdated: daysAgo,
+                weeksInCurrentGrade,
+                targetGrade,
+                transitionProgress,
+                etaDate,
+                stableSinceDate,
+                originalGrade: grade // Track original for reverting
+            });
+        }
+
+        // Generate 40 themes with associations
+        let themes = [];
+        let associations = [];
+        let associationId = 0;
+        let companyThemeCount = {}; // Track how many themes each company has
+        
+        // Initialize company theme count
+        companies.forEach(c => companyThemeCount[c.ticker] = 0);
+        
+        for (let i = 0; i < 40; i++) {
+            const strength = [2, 1, 0, -1, -2][Math.floor(Math.random() * 5)];
+            const daysAgo = Math.floor(Math.random() * 60);
+            
+            // Generate theme transition data (2 week timeframe = 14 days)
+            const daysInCurrentStrength = Math.floor(Math.random() * 20); // 0-19 days
+            let targetStrength = null;
+            let transitionProgress = 0;
+            let etaDate = null;
+            let stableSinceDate = null;
+            
+            if (daysInCurrentStrength < 14) {
+                // Still transitioning
+                const possibleTargets = [2, 1, 0, -1, -2].filter(s => s !== strength);
+                targetStrength = possibleTargets[Math.floor(Math.random() * possibleTargets.length)];
+                transitionProgress = (daysInCurrentStrength / 14) * 100;
+                
+                // Calculate ETA
+                const daysRemaining = 14 - daysInCurrentStrength;
+                const eta = new Date();
+                eta.setDate(eta.getDate() + daysRemaining);
+                etaDate = eta;
+            } else {
+                // Stable - set "since" date
+                const daysStable = Math.floor(Math.random() * 90); // 0-90 days stable
+                stableSinceDate = new Date();
+                stableSinceDate.setDate(stableSinceDate.getDate() - daysStable);
+            }
+            
+            // Each theme gets 15-20 company associations
+            const numAssociations = 15 + Math.floor(Math.random() * 6);
+            const themeCompanies = [];
+            
+            for (let j = 0; j < numAssociations; j++) {
+                const company = companies[Math.floor(Math.random() * companies.length)];
+                const relationship = Math.random() > 0.6 ? 'Strong' : 'Weak';
+                const assocDaysAgo = Math.floor(Math.random() * 45);
+                
+                // Generate association transition data (2 week timeframe)
+                const daysInCurrentRelationship = Math.floor(Math.random() * 20);
+                let targetRelationship = null;
+                let assocTransitionProgress = 0;
+                let assocEtaDate = null;
+                let assocStableSinceDate = null;
+                
+                if (daysInCurrentRelationship < 14) {
+                    targetRelationship = relationship === 'Strong' ? 'Weak' : 'Strong';
+                    assocTransitionProgress = (daysInCurrentRelationship / 14) * 100;
+                    
+                    const daysRemaining = 14 - daysInCurrentRelationship;
+                    const eta = new Date();
+                    eta.setDate(eta.getDate() + daysRemaining);
+                    assocEtaDate = eta;
+                } else {
+                    // Stable - set "since" date
+                    const daysStable = Math.floor(Math.random() * 90); // 0-90 days stable
+                    assocStableSinceDate = new Date();
+                    assocStableSinceDate.setDate(assocStableSinceDate.getDate() - daysStable);
+                }
+                
+                associations.push({
+                    id: associationId++,
+                    ticker: company.ticker,
+                    companyName: company.name,
+                    themeId: i,
+                    themeName: themeNames[i],
+                    relationship,
+                    lastChanged: assocDaysAgo,
+                    daysInCurrentRelationship,
+                    targetRelationship,
+                    transitionProgress: assocTransitionProgress,
+                    etaDate: assocEtaDate,
+                    stableSinceDate: assocStableSinceDate,
+                    originalRelationship: relationship // Track original for reverting
+                });
+                
+                themeCompanies.push({
+                    ticker: company.ticker,
+                    name: company.name,
+                    relationship
+                });
+                
+                // Track that this company has a theme
+                companyThemeCount[company.ticker]++;
+            }
+            
+            themes.push({
+                id: i,
+                name: themeNames[i],
+                description: themeDescriptions[i],
+                strength,
+                companies: themeCompanies,
+                lastEdited: daysAgo,
+                daysInCurrentStrength,
+                targetStrength,
+                transitionProgress,
+                etaDate,
+                stableSinceDate,
+                originalStrength: strength // Track original for reverting
+            });
+        }
+        
+        // Ensure all companies have at least 1 theme
+        companies.forEach(company => {
+            if (companyThemeCount[company.ticker] === 0) {
+                // Pick a random theme and add this company to it
+                const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+                const relationship = Math.random() > 0.5 ? 'Strong' : 'Weak';
+                
+                randomTheme.companies.push({
+                    ticker: company.ticker,
+                    name: company.name,
+                    relationship
+                });
+                
+                // Create association
+                const daysStable = Math.floor(Math.random() * 90);
+                const stableSince = new Date();
+                stableSince.setDate(stableSince.getDate() - daysStable);
+                
+                associations.push({
+                    id: associationId++,
+                    ticker: company.ticker,
+                    companyName: company.name,
+                    themeId: randomTheme.id,
+                    themeName: randomTheme.name,
+                    relationship,
+                    lastChanged: Math.floor(Math.random() * 45),
+                    daysInCurrentRelationship: 14,
+                    targetRelationship: null,
+                    transitionProgress: 0,
+                    etaDate: null,
+                    stableSinceDate: stableSince,
+                    originalRelationship: relationship
+                });
+            }
+        });
+
+        // ========== HELPER FUNCTIONS ==========
+        
+        function formatDaysAgo(days) {
+            if (days === 0) return 'Today';
+            if (days === 1) return 'Yesterday';
+            if (days < 7) return `${days} days ago`;
+            if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+            return `${Math.floor(days / 30)} months ago`;
+        }
+
+        function formatDate(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+        }
+
+        let currentSort = 'desc';
+        let currentThemeSort = 'desc';
+        let currentAssocSort = 'desc';
+        let currentGradeFilter = 'all';
+        let currentThemeFilter = 'all';
+        let expandedThemeId = null;
+
+        // ========== VIEW MANAGEMENT ==========
+        
+        function showView(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view-content').forEach(v => v.classList.add('hidden'));
+            
+            // Show selected view
+            const viewMap = {
+                'abcdf': 'abcdf-view',
+                'themes': 'themes-view',
+                'company-detail': 'company-detail-view',
+                'theme-detail': 'theme-detail-view'
+            };
+            
+            document.getElementById(viewMap[viewName]).classList.remove('hidden');
+            
+            // Update nav items
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            const navMap = {
+                'abcdf': 0,
+                'themes': 1,
+                'company-detail': 0,
+                'theme-detail': 1
+            };
+            document.querySelectorAll('.nav-item')[navMap[viewName]]?.classList.add('active');
+            
+            // Update title
+            const titles = {
+                'abcdf': 'Swan Grade Management',
+                'themes': 'Theme Management',
+                'company-detail': 'Company Details',
+                'theme-detail': 'Theme Details'
+            };
+            document.getElementById('page-title').textContent = titles[viewName];
+        }
+
+        // ========== SWAN GRADE VIEW ==========
+        
+        function renderABCDFTable() {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            
+            // Apply filters
+            let filteredCompanies = companies.filter(c => {
+                if (currentGradeFilter !== 'all' && c.grade !== currentGradeFilter) return false;
+                
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                if (searchTerm && !c.ticker.toLowerCase().includes(searchTerm) && 
+                    !c.name.toLowerCase().includes(searchTerm)) return false;
+                
+                return true;
+            });
+            
+            // Apply sort
+            filteredCompanies.sort((a, b) => {
+                if (currentSort === 'asc') {
+                    return a.lastUpdated - b.lastUpdated;
+                } else {
+                    return b.lastUpdated - a.lastUpdated;
+                }
+            });
+            
+            filteredCompanies.forEach(company => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                
+                // Generate status cell content
+                let statusHTML = '';
+                if (company.weeksInCurrentGrade >= 10 || company.targetGrade === null) {
+                    statusHTML = `
+                        <div class="status-complete">Grade ${company.grade}</div>
+                        <div class="status-transitioning">Since: ${formatDate(company.stableSinceDate)}</div>
+                    `;
+                } else {
+                    statusHTML = `
+                        <div class="status-transitioning">Moving from ${company.targetGrade} to ${company.grade}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${company.transitionProgress}%"></div>
+                        </div>
+                        <div class="status-transitioning">ETA: ${formatDate(company.etaDate)}</div>
+                    `;
+                }
+                
+                row.innerHTML = `
+                    <div><input type="checkbox" class="checkbox row-checkbox"></div>
+                    <div class="ticker" onclick="viewCompanyDetail('${company.ticker}')">${company.ticker}</div>
+                    <div class="company-name">${company.name}</div>
+                    <div class="company-name">${company.sector}</div>
+                    <div class="grade-selector">
+                        <div class="grade-pill grade-A ${company.grade === 'A' ? 'active' : ''}" data-grade="A">A</div>
+                        <div class="grade-pill grade-B ${company.grade === 'B' ? 'active' : ''}" data-grade="B">B</div>
+                        <div class="grade-pill grade-C ${company.grade === 'C' ? 'active' : ''}" data-grade="C">C</div>
+                        <div class="grade-pill grade-D ${company.grade === 'D' ? 'active' : ''}" data-grade="D">D</div>
+                        <div class="grade-pill grade-F ${company.grade === 'F' ? 'active' : ''}" data-grade="F">F</div>
+                    </div>
+                    <div class="status-cell">${statusHTML}</div>
+                    <div class="last-updated">${formatDaysAgo(company.lastUpdated)}</div>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            updateGradeStats();
+        }
+
+        function updateGradeStats() {
+            const counts = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+            companies.forEach(c => counts[c.grade]++);
+            
+            document.getElementById('grade-a-count').textContent = counts.A;
+            document.getElementById('grade-b-count').textContent = counts.B;
+            document.getElementById('grade-c-count').textContent = counts.C;
+            document.getElementById('grade-d-count').textContent = counts.D;
+            document.getElementById('grade-f-count').textContent = counts.F;
+        }
+
+        function sortByLastUpdated() {
+            currentSort = currentSort === 'asc' ? 'desc' : 'asc';
+            document.getElementById('sort-icon').textContent = currentSort === 'asc' ? '▲' : '▼';
+            document.getElementById('sort-icon').classList.add('active');
+            renderABCDFTable();
+        }
+
+        function viewCompanyDetail(ticker) {
+            const company = companies.find(c => c.ticker === ticker);
+            if (!company) return;
+            
+            // Populate company details
+            document.getElementById('company-detail-title').textContent = `${company.ticker} - ${company.name}`;
+            
+            // Populate grade selector
+            const gradeHTML = `
+                <div class="grade-selector">
+                    <div class="grade-pill grade-A ${company.grade === 'A' ? 'active' : ''}" data-grade="A" onclick="changeCompanyGrade('${ticker}', 'A')">A</div>
+                    <div class="grade-pill grade-B ${company.grade === 'B' ? 'active' : ''}" data-grade="B" onclick="changeCompanyGrade('${ticker}', 'B')">B</div>
+                    <div class="grade-pill grade-C ${company.grade === 'C' ? 'active' : ''}" data-grade="C" onclick="changeCompanyGrade('${ticker}', 'C')">C</div>
+                    <div class="grade-pill grade-D ${company.grade === 'D' ? 'active' : ''}" data-grade="D" onclick="changeCompanyGrade('${ticker}', 'D')">D</div>
+                    <div class="grade-pill grade-F ${company.grade === 'F' ? 'active' : ''}" data-grade="F" onclick="changeCompanyGrade('${ticker}', 'F')">F</div>
+                </div>
+            `;
+            document.getElementById('company-detail-grade').innerHTML = gradeHTML;
+            
+            // Populate status
+            let statusHTML = '';
+            if (company.weeksInCurrentGrade >= 10 || company.targetGrade === null) {
+                statusHTML = `
+                    <div class="status-complete">Grade ${company.grade}</div>
+                    <div class="status-transitioning">Since: ${formatDate(company.stableSinceDate)}</div>
+                `;
+            } else {
+                statusHTML = `
+                    <div class="status-transitioning">Moving from ${company.targetGrade} to ${company.grade}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${company.transitionProgress}%"></div>
+                    </div>
+                    <div class="status-transitioning">ETA: ${formatDate(company.etaDate)}</div>
+                `;
+            }
+            document.getElementById('company-detail-status').innerHTML = statusHTML;
+            
+            // Find associated themes - render as rows
+            const companyAssocs = associations.filter(a => a.ticker === ticker);
+            document.getElementById('company-theme-count').textContent = companyAssocs.length;
+            
+            let themesHTML = '';
+            if (companyAssocs.length === 0) {
+                themesHTML = '<div style="color: #888; margin-top: 12px;">No themes associated with this company</div>';
+            } else {
+                themesHTML = '<div class="company-row-table" style="margin-top: 12px;">';
+                themesHTML += `
+                    <div class="company-row-header">
+                        <div></div>
+                        <div>Theme</div>
+                        <div></div>
+                        <div>Strength</div>
+                        <div>Relationship</div>
+                        <div>Status</div>
+                    </div>
+                `;
+                companyAssocs.forEach(assoc => {
+                    const theme = themes.find(t => t.id === assoc.themeId);
+                    const strengthClass = `strength-${theme.strength >= 0 ? 'plus-' : 'minus-'}${Math.abs(theme.strength)}`;
+                    const strengthLabel = theme.strength > 0 ? `+${theme.strength}` : theme.strength;
+                    
+                    // Generate status HTML
+                    let statusHTML = '';
+                    if (assoc.daysInCurrentRelationship >= 14 || assoc.targetRelationship === null) {
+                        statusHTML = `
+                            <div class="status-complete">${assoc.relationship}</div>
+                            <div class="status-transitioning" style="font-size: 11px;">Since: ${formatDate(assoc.stableSinceDate)}</div>
+                        `;
+                    } else {
+                        statusHTML = `
+                            <div class="status-transitioning" style="font-size: 11px;">From ${assoc.targetRelationship} to ${assoc.relationship}</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${assoc.transitionProgress}%"></div>
+                            </div>
+                            <div class="status-transitioning" style="font-size: 11px;">ETA: ${formatDate(assoc.etaDate)}</div>
+                        `;
+                    }
+                    
+                themesHTML += `
+                    <div class="company-row">
+                        <div></div>
+                        <div class="view-link" onclick="viewThemeDetail(${theme.id})">${assoc.themeName}</div>
+                        <div></div>
+                        <div><span class="theme-strength ${strengthClass}">${strengthLabel}</span></div>
+                        <div><span class="chip-relationship relationship-${assoc.relationship.toLowerCase()} relationship-toggle" onclick="toggleCompanyThemeRelationship('${ticker}', ${assoc.id})">${assoc.relationship}</span></div>
+                        <div class="status-cell">${statusHTML}</div>
+                    </div>
+                `;
+                });
+                
+                // Add empty row for adding new themes
+                themesHTML += `
+                    <div class="company-row" style="background: #0f0f0f; border-top: 2px solid #4a9eff;">
+                        <div></div>
+                        <div style="position: relative;">
+                            <input type="text" class="add-ticker-input" placeholder="Add theme..." id="company-detail-add-theme-${ticker}" oninput="showCompanyDetailThemeAutocomplete('${ticker}', this.value)" style="width: 100%; padding: 6px 10px;">
+                            <div class="autocomplete-dropdown hidden" id="company-detail-theme-autocomplete-${ticker}"></div>
+                        </div>
+                        <div></div>
+                        <div></div>
+                        <div>
+                            <select class="relationship-select-small" id="company-detail-relationship-${ticker}">
+                                <option>Strong</option>
+                                <option>Weak</option>
+                            </select>
+                        </div>
+                        <div>
+                            <button class="btn-primary" style="padding: 6px 12px; font-size: 13px;" onclick="addThemeToCompanyDetail('${ticker}')">Add</button>
+                        </div>
+                    </div>
+                `;
+                themesHTML += '</div>';
+            }
+            document.getElementById('company-detail-themes').innerHTML = themesHTML;
+            
+            showView('company-detail');
+        }
+
+        function changeCompanyGrade(ticker, newGrade) {
+            const company = companies.find(c => c.ticker === ticker);
+            if (company) {
+                // If no transition has started (at original, stable)
+                if (company.targetGrade === null) {
+                    if (newGrade === company.originalGrade) {
+                        // Clicking same grade when stable - do nothing
+                        return;
+                    }
+                    // Start new transition from original
+                    company.targetGrade = company.originalGrade;
+                    company.grade = newGrade;
+                    company.lastUpdated = 0;
+                    company.weeksInCurrentGrade = 0;
+                    company.transitionProgress = 0;
+                    
+                    const eta = new Date();
+                    eta.setDate(eta.getDate() + (10 * 7));
+                    company.etaDate = eta;
+                    company.stableSinceDate = new Date();
+                    viewCompanyDetail(ticker);
+                    return;
+                }
+                
+                // Transition is in progress
+                if (newGrade === company.targetGrade) {
+                    // Clicking back to original - invert progress bar
+                    const oldProgress = company.transitionProgress;
+                    company.grade = newGrade;
+                    company.transitionProgress = 100 - oldProgress; // Invert
+                    // Swap target and destination
+                    const temp = company.targetGrade;
+                    company.targetGrade = company.grade;
+                    company.grade = temp;
+                    viewCompanyDetail(ticker);
+                    return;
+                }
+                
+                if (newGrade === company.grade) {
+                    // Clicking same destination - no change
+                    return;
+                }
+                
+                // Clicking different destination - reset progress
+                company.grade = newGrade;
+                company.lastUpdated = 0;
+                company.weeksInCurrentGrade = 0;
+                company.transitionProgress = 0;
+                
+                const eta = new Date();
+                eta.setDate(eta.getDate() + (10 * 7));
+                company.etaDate = eta;
+                company.stableSinceDate = new Date();
+            }
+            viewCompanyDetail(ticker);
+        }
+
+        function toggleCompanyThemeRelationship(ticker, assocId) {
+            const assoc = associations.find(a => a.id === assocId);
+            if (assoc) {
+                const newRelationship = assoc.relationship === 'Strong' ? 'Weak' : 'Strong';
+                
+                // If no transition has started (at original, stable)
+                if (assoc.targetRelationship === null) {
+                    if (newRelationship === assoc.originalRelationship) {
+                        // Clicking same when stable - do nothing
+                        return;
+                    }
+                    // Start new transition from original
+                    assoc.targetRelationship = assoc.originalRelationship;
+                    assoc.relationship = newRelationship;
+                    assoc.lastChanged = 0;
+                    assoc.daysInCurrentRelationship = 0;
+                    assoc.transitionProgress = 0;
+                    
+                    const eta = new Date();
+                    eta.setDate(eta.getDate() + 14);
+                    assoc.etaDate = eta;
+                    assoc.stableSinceDate = new Date();
+                    
+                    // Update in theme data
+                    const theme = themes.find(t => t.id === assoc.themeId);
+                    if (theme) {
+                        const company = theme.companies.find(c => c.ticker === ticker);
+                        if (company) {
+                            company.relationship = assoc.relationship;
+                        }
+                    }
+                    
+                    viewCompanyDetail(ticker);
+                    return;
+                }
+                
+                // Transition is in progress - invert
+                const oldProgress = assoc.transitionProgress;
+                assoc.relationship = newRelationship;
+                assoc.transitionProgress = 100 - oldProgress;
+                // Swap target and destination
+                const temp = assoc.targetRelationship;
+                assoc.targetRelationship = assoc.relationship;
+                assoc.relationship = temp;
+                
+                // Update in theme data
+                const theme = themes.find(t => t.id === assoc.themeId);
+                if (theme) {
+                    const company = theme.companies.find(c => c.ticker === ticker);
+                    if (company) {
+                        company.relationship = assoc.relationship;
+                    }
+                }
+                
+                viewCompanyDetail(ticker);
+            }
+        }
+
+        // ========== THEME VIEW ==========
+        
+        function renderThemeTable() {
+            const tbody = document.getElementById('theme-table-body');
+            tbody.innerHTML = '';
+            
+            // Apply filters
+            let filteredThemes = themes.filter(t => {
+                if (currentThemeFilter !== 'all' && t.strength.toString() !== currentThemeFilter) return false;
+                
+                const searchTerm = document.getElementById('theme-search').value.toLowerCase();
+                if (searchTerm && !t.name.toLowerCase().includes(searchTerm) && 
+                    !t.description.toLowerCase().includes(searchTerm)) return false;
+                
+                return true;
+            });
+            
+            // Apply sort
+            filteredThemes.sort((a, b) => {
+                if (currentThemeSort === 'asc') {
+                    return a.lastEdited - b.lastEdited;
+                } else {
+                    return b.lastEdited - a.lastEdited;
+                }
+            });
+            
+            filteredThemes.forEach(theme => {
+                const row = document.createElement('div');
+                row.className = 'theme-table-row';
+                
+                const strengthClass = `strength-${theme.strength >= 0 ? 'plus-' : 'minus-'}${Math.abs(theme.strength)}`;
+                const strengthLabel = theme.strength > 0 ? `+${theme.strength}` : theme.strength;
+                
+                // Generate status HTML
+                let statusHTML = '';
+                if (theme.daysInCurrentStrength >= 14 || theme.targetStrength === null) {
+                    statusHTML = `
+                        <div class="status-complete">Strength ${strengthLabel}</div>
+                        <div class="status-transitioning">Since: ${formatDate(theme.stableSinceDate)}</div>
+                    `;
+                } else {
+                    const targetLabel = theme.targetStrength > 0 ? `+${theme.targetStrength}` : theme.targetStrength;
+                    statusHTML = `
+                        <div class="status-transitioning">Moving from ${targetLabel} to ${strengthLabel}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${theme.transitionProgress}%"></div>
+                        </div>
+                        <div class="status-transitioning">ETA: ${formatDate(theme.etaDate)}</div>
+                    `;
+                }
+                
+                row.innerHTML = `
+                    <div class="theme-name-cell" onclick="viewThemeDetail(${theme.id})">${theme.name}</div>
+                    <div class="theme-description-cell">${theme.description}</div>
+                    <div><span class="theme-strength ${strengthClass}">${strengthLabel}</span></div>
+                    <div class="company-count-cell" onclick="toggleThemeExpansion(${theme.id})">${theme.companies.length} companies</div>
+                    <div class="status-cell">${statusHTML}</div>
+                    <div class="last-updated">${formatDaysAgo(theme.lastEdited)}</div>
+                    <div class="theme-actions">
+                        <button class="icon-btn" onclick="deleteTheme(${theme.id})">🗑️</button>
+                    </div>
+                `;
+                
+                tbody.appendChild(row);
+                
+                // Add expanded companies section if this theme is expanded
+                if (expandedThemeId === theme.id) {
+                    const expandedRow = document.createElement('div');
+                    expandedRow.className = 'theme-table-row';
+                    expandedRow.innerHTML = `
+                        <div class="expanded-companies">
+                            <div class="expanded-companies-header">
+                                <div style="font-weight: 600;">Associated Companies</div>
+                                <div>
+                                    <button class="btn-secondary" onclick="selectAllThemeCompanies(${theme.id})">Select All</button>
+                                    <button class="btn-secondary" onclick="bulkRemoveFromTheme(${theme.id})">Remove Selected</button>
+                                </div>
+                            </div>
+                            <div class="company-row-table">
+                                <div class="company-row-header">
+                                    <div></div>
+                                    <div>Ticker</div>
+                                    <div>Company</div>
+                                    <div>Relationship</div>
+                                    <div>Status</div>
+                                    <div>Remove</div>
+                                </div>
+                                ${theme.companies.map(c => {
+                                    const assoc = associations.find(a => a.themeId === theme.id && a.ticker === c.ticker);
+                                    let statusHTML = '';
+                                    if (assoc) {
+                                        if (assoc.daysInCurrentRelationship >= 14 || assoc.targetRelationship === null) {
+                                            statusHTML = `
+                                                <div class="status-complete">${assoc.relationship}</div>
+                                                <div class="status-transitioning" style="font-size: 10px;">Since: ${formatDate(assoc.stableSinceDate)}</div>
+                                            `;
+                                        } else {
+                                            statusHTML = `
+                                                <div class="status-transitioning" style="font-size: 11px;">From ${assoc.targetRelationship} to ${assoc.relationship}</div>
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: ${assoc.transitionProgress}%"></div>
+                                                </div>
+                                                <div class="status-transitioning" style="font-size: 10px;">ETA: ${formatDate(assoc.etaDate)}</div>
+                                            `;
+                                        }
+                                    }
+                                    return `
+                                    <div class="company-row">
+                                        <div><input type="checkbox" class="checkbox theme-company-checkbox" data-ticker="${c.ticker}"></div>
+                                        <div class="ticker">${c.ticker}</div>
+                                        <div class="company-name">${c.name}</div>
+                                        <div><span class="chip-relationship relationship-${c.relationship.toLowerCase()} relationship-toggle" onclick="toggleThemeCompanyRelationship(${theme.id}, '${c.ticker}')">${c.relationship}</span></div>
+                                        <div class="status-cell">${statusHTML}</div>
+                                        <div class="remove-btn" onclick="removeCompanyFromTheme(${theme.id}, '${c.ticker}')">×</div>
+                                    </div>
+                                `;
+                                }).join('')}
+                                <div class="add-ticker-row">
+                                    <div></div>
+                                    <div style="position: relative;">
+                                        <input type="text" class="add-ticker-input" placeholder="Add ticker..." id="add-ticker-${theme.id}" oninput="showTickerAutocomplete(${theme.id}, this.value)" onkeydown="handleAddTickerKeydown(event, ${theme.id})">
+                                        <div class="autocomplete-dropdown hidden" id="autocomplete-${theme.id}"></div>
+                                    </div>
+                                    <div id="selected-company-name-${theme.id}" style="color: #888; font-size: 13px;"></div>
+                                    <div>
+                                        <select class="relationship-select-small" id="relationship-select-${theme.id}">
+                                            <option>Strong</option>
+                                            <option>Weak</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <button class="btn-primary" style="padding: 6px 12px; font-size: 13px;" onclick="addTickerToTheme(${theme.id})">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    tbody.appendChild(expandedRow);
+                }
+            });
+            
+            updateThemeStats();
+        }
+
+        function updateThemeStats() {
+            const counts = { '2': 0, '1': 0, '0': 0, '-1': 0, '-2': 0 };
+            themes.forEach(t => counts[t.strength.toString()]++);
+            
+            document.getElementById('strength-plus-2-count').textContent = counts['2'];
+            document.getElementById('strength-plus-1-count').textContent = counts['1'];
+            document.getElementById('strength-0-count').textContent = counts['0'];
+            document.getElementById('strength-minus-1-count').textContent = counts['-1'];
+            document.getElementById('strength-minus-2-count').textContent = counts['-2'];
+        }
+
+        function sortThemesByLastEdit() {
+            currentThemeSort = currentThemeSort === 'asc' ? 'desc' : 'asc';
+            document.getElementById('theme-sort-icon').textContent = currentThemeSort === 'asc' ? '▲' : '▼';
+            document.getElementById('theme-sort-icon').classList.add('active');
+            renderThemeTable();
+        }
+
+        function toggleThemeExpansion(themeId) {
+            expandedThemeId = expandedThemeId === themeId ? null : themeId;
+            renderThemeTable();
+        }
+
+        function viewThemeDetail(themeId) {
+            const theme = themes.find(t => t.id === themeId);
+            if (!theme) return;
+            
+            document.getElementById('theme-detail-title').textContent = theme.name;
+            document.getElementById('theme-detail-description').value = theme.description;
+            
+            // Hide save button initially
+            document.getElementById('theme-desc-save-btn').style.display = 'none';
+            
+            // Show save button when description is edited
+            document.getElementById('theme-detail-description').oninput = function() {
+                document.getElementById('theme-desc-save-btn').style.display = 'inline-block';
+            };
+            
+            // Render editable strength selector
+            const strengthOptions = [
+                { value: 2, label: '+2', class: 'strength-plus-2' },
+                { value: 1, label: '+1', class: 'strength-plus-1' },
+                { value: 0, label: '0', class: 'strength-0' },
+                { value: -1, label: '-1', class: 'strength-minus-1' },
+                { value: -2, label: '-2', class: 'strength-minus-2' }
+            ];
+            
+            let strengthHTML = '<div class="strength-selector" style="margin-top: 8px;">';
+            strengthOptions.forEach(opt => {
+                const active = theme.strength === opt.value ? 'selected' : '';
+                strengthHTML += `<div class="strength-option ${opt.class} ${active}" onclick="changeThemeStrength(${themeId}, ${opt.value})" style="cursor: pointer; flex: 1; padding: 8px; text-align: center; border-radius: 6px;">${opt.label}</div>`;
+            });
+            strengthHTML += '</div>';
+            
+            document.getElementById('theme-detail-strength').innerHTML = strengthHTML;
+            
+            // Populate status
+            let statusHTML = '';
+            if (theme.daysInCurrentStrength >= 14 || theme.targetStrength === null) {
+                const strengthLabel = theme.strength > 0 ? `+${theme.strength}` : theme.strength;
+                statusHTML = `
+                    <div class="status-complete">Strength ${strengthLabel}</div>
+                    <div class="status-transitioning">Since: ${formatDate(theme.stableSinceDate)}</div>
+                `;
+            } else {
+                const targetLabel = theme.targetStrength > 0 ? `+${theme.targetStrength}` : theme.targetStrength;
+                const currentLabel = theme.strength > 0 ? `+${theme.strength}` : theme.strength;
+                statusHTML = `
+                    <div class="status-transitioning">Moving from ${targetLabel} to ${currentLabel}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${theme.transitionProgress}%"></div>
+                    </div>
+                    <div class="status-transitioning">ETA: ${formatDate(theme.etaDate)}</div>
+                `;
+            }
+            document.getElementById('theme-detail-status').innerHTML = statusHTML;
+            
+            document.getElementById('theme-detail-company-count').textContent = theme.companies.length;
+            
+            // Render companies
+            let companiesHTML = '<div class="company-row-table" style="margin-top: 16px;">';
+            companiesHTML += `
+                <div class="company-row-header">
+                    <div></div>
+                    <div>Ticker</div>
+                    <div>Company</div>
+                    <div>Relationship</div>
+                    <div>Status</div>
+                    <div>Remove</div>
+                </div>
+            `;
+            theme.companies.forEach(c => {
+                const assoc = associations.find(a => a.themeId === themeId && a.ticker === c.ticker);
+                
+                // Generate status HTML
+                let statusHTML = '';
+                if (assoc) {
+                    if (assoc.daysInCurrentRelationship >= 14 || assoc.targetRelationship === null) {
+                        statusHTML = `
+                            <div class="status-complete">${assoc.relationship}</div>
+                            <div class="status-transitioning" style="font-size: 11px;">Since: ${formatDate(assoc.stableSinceDate)}</div>
+                        `;
+                    } else {
+                        statusHTML = `
+                            <div class="status-transitioning" style="font-size: 11px;">From ${assoc.targetRelationship} to ${assoc.relationship}</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${assoc.transitionProgress}%"></div>
+                            </div>
+                            <div class="status-transitioning" style="font-size: 11px;">ETA: ${formatDate(assoc.etaDate)}</div>
+                        `;
+                    }
+                }
+                
+                companiesHTML += `
+                    <div class="company-row">
+                        <div></div>
+                        <div class="ticker" onclick="viewCompanyDetail('${c.ticker}')">${c.ticker}</div>
+                        <div class="company-name">${c.name}</div>
+                        <div><span class="chip-relationship relationship-${c.relationship.toLowerCase()} relationship-toggle" onclick="toggleThemeDetailRelationship(${themeId}, '${c.ticker}')">${c.relationship}</span></div>
+                        <div class="status-cell">${statusHTML}</div>
+                        <div class="remove-btn" onclick="removeCompanyFromThemeDetail(${themeId}, '${c.ticker}')">×</div>
+                    </div>
+                `;
+            });
+            
+            // Add empty row for adding new companies
+            companiesHTML += `
+                <div class="company-row" style="background: #0f0f0f; border-top: 2px solid #4a9eff;">
+                    <div></div>
+                    <div style="position: relative;">
+                        <input type="text" class="add-ticker-input" placeholder="Add ticker..." id="theme-detail-add-ticker-${themeId}" oninput="showThemeDetailAutocomplete(${themeId}, this.value)" style="width: 100%; padding: 6px 10px;">
+                        <div class="autocomplete-dropdown hidden" id="theme-detail-autocomplete-${themeId}"></div>
+                    </div>
+                    <div id="theme-detail-company-name-${themeId}" style="color: #888; font-size: 13px;"></div>
+                    <div>
+                        <select class="relationship-select-small" id="theme-detail-relationship-${themeId}">
+                            <option>Strong</option>
+                            <option>Weak</option>
+                        </select>
+                    </div>
+                    <div></div>
+                    <div>
+                        <button class="btn-primary" style="padding: 6px 12px; font-size: 13px;" onclick="addCompanyToThemeDetail(${themeId})">Add</button>
+                    </div>
+                </div>
+            `;
+            companiesHTML += '</div>';
+            
+            document.getElementById('theme-detail-companies').innerHTML = companiesHTML;
+            
+            showView('theme-detail');
+        }
+
+        function changeThemeStrength(themeId, newStrength) {
+            const theme = themes.find(t => t.id === themeId);
+            if (theme) {
+                // If no transition has started (at original, stable)
+                if (theme.targetStrength === null) {
+                    if (newStrength === theme.originalStrength) {
+                        // Clicking same strength when stable - do nothing
+                        return;
+                    }
+                    // Start new transition from original
+                    theme.targetStrength = theme.originalStrength;
+                    theme.strength = newStrength;
+                    theme.lastEdited = 0;
+                    theme.daysInCurrentStrength = 0;
+                    theme.transitionProgress = 0;
+                    
+                    const eta = new Date();
+                    eta.setDate(eta.getDate() + 14);
+                    theme.etaDate = eta;
+                    theme.stableSinceDate = new Date();
+                    viewThemeDetail(themeId);
+                    return;
+                }
+                
+                // Transition is in progress
+                if (newStrength === theme.targetStrength) {
+                    // Clicking back to original - invert progress bar
+                    const oldProgress = theme.transitionProgress;
+                    theme.strength = newStrength;
+                    theme.transitionProgress = 100 - oldProgress;
+                    // Swap target and destination
+                    const temp = theme.targetStrength;
+                    theme.targetStrength = theme.strength;
+                    theme.strength = temp;
+                    viewThemeDetail(themeId);
+                    return;
+                }
+                
+                if (newStrength === theme.strength) {
+                    // Clicking same destination - no change
+                    return;
+                }
+                
+                // Clicking different destination - reset progress
+                theme.strength = newStrength;
+                theme.lastEdited = 0;
+                theme.daysInCurrentStrength = 0;
+                theme.transitionProgress = 0;
+                
+                const eta = new Date();
+                eta.setDate(eta.getDate() + 14);
+                theme.etaDate = eta;
+                theme.stableSinceDate = new Date();
+                
+                viewThemeDetail(themeId);
+            }
+        }
+
+        function toggleThemeDetailRelationship(themeId, ticker) {
+            const theme = themes.find(t => t.id === themeId);
+            const assoc = associations.find(a => a.themeId === themeId && a.ticker === ticker);
+            
+            if (theme && assoc) {
+                const newRelationship = assoc.relationship === 'Strong' ? 'Weak' : 'Strong';
+                
+                // If no transition has started (at original, stable)
+                if (assoc.targetRelationship === null) {
+                    if (newRelationship === assoc.originalRelationship) {
+                        // Clicking same when stable - do nothing
+                        return;
+                    }
+                    // Start new transition from original
+                    assoc.targetRelationship = assoc.originalRelationship;
+                    assoc.relationship = newRelationship;
+                    assoc.lastChanged = 0;
+                    assoc.daysInCurrentRelationship = 0;
+                    assoc.transitionProgress = 0;
+                    
+                    const eta = new Date();
+                    eta.setDate(eta.getDate() + 14);
+                    assoc.etaDate = eta;
+                    assoc.stableSinceDate = new Date();
+                    
+                    // Update in theme data
+                    const company = theme.companies.find(c => c.ticker === ticker);
+                    if (company) {
+                        company.relationship = assoc.relationship;
+                    }
+                    
+                    viewThemeDetail(themeId);
+                    return;
+                }
+                
+                // Transition is in progress - invert
+                const oldProgress = assoc.transitionProgress;
+                assoc.relationship = newRelationship;
+                assoc.transitionProgress = 100 - oldProgress;
+                // Swap target and destination
+                const temp = assoc.targetRelationship;
+                assoc.targetRelationship = assoc.relationship;
+                assoc.relationship = temp;
+                
+                // Update in theme data
+                const company = theme.companies.find(c => c.ticker === ticker);
+                if (company) {
+                    company.relationship = assoc.relationship;
+                }
+                
+                viewThemeDetail(themeId);
+            }
+        }
+
+        function selectAllThemeCompanies(themeId) {
+            const checkboxes = document.querySelectorAll('.theme-company-checkbox');
+            checkboxes.forEach(cb => cb.checked = true);
+        }
+
+        function toggleThemeCompanyRelationship(themeId, ticker) {
+            const theme = themes.find(t => t.id === themeId);
+            const assoc = associations.find(a => a.themeId === themeId && a.ticker === ticker);
+            
+            if (theme && assoc) {
+                const newRelationship = assoc.relationship === 'Strong' ? 'Weak' : 'Strong';
+                
+                // If no transition has started (at original, stable)
+                if (assoc.targetRelationship === null) {
+                    if (newRelationship === assoc.originalRelationship) {
+                        // Clicking same when stable - do nothing
+                        return;
+                    }
+                    // Start new transition from original
+                    assoc.targetRelationship = assoc.originalRelationship;
+                    assoc.relationship = newRelationship;
+                    assoc.lastChanged = 0;
+                    assoc.daysInCurrentRelationship = 0;
+                    assoc.transitionProgress = 0;
+                    
+                    const eta = new Date();
+                    eta.setDate(eta.getDate() + 14);
+                    assoc.etaDate = eta;
+                    assoc.stableSinceDate = new Date();
+                    
+                    // Update in theme data
+                    const company = theme.companies.find(c => c.ticker === ticker);
+                    if (company) {
+                        company.relationship = assoc.relationship;
+                    }
+                    
+                    renderThemeTable();
+                    return;
+                }
+                
+                // Transition is in progress - invert
+                const oldProgress = assoc.transitionProgress;
+                assoc.relationship = newRelationship;
+                assoc.transitionProgress = 100 - oldProgress;
+                // Swap target and destination
+                const temp = assoc.targetRelationship;
+                assoc.targetRelationship = assoc.relationship;
+                assoc.relationship = temp;
+                
+                // Update in theme data
+                const company = theme.companies.find(c => c.ticker === ticker);
+                if (company) {
+                    company.relationship = assoc.relationship;
+                }
+                
+                renderThemeTable();
+            }
+        }
+
+        function bulkRemoveFromTheme(themeId) {
+            const checkboxes = document.querySelectorAll('.theme-company-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('Please select companies first');
+                return;
+            }
+            if (confirm(`Remove ${checkboxes.length} companies from this theme?`)) {
+                const theme = themes.find(t => t.id === themeId);
+                checkboxes.forEach(cb => {
+                    const ticker = cb.dataset.ticker;
+                    theme.companies = theme.companies.filter(c => c.ticker !== ticker);
+                    associations = associations.filter(a => !(a.themeId === themeId && a.ticker === ticker));
+                });
+                renderThemeTable();
+            }
+        }
+
+        function removeCompanyFromTheme(themeId, ticker) {
+            if (confirm(`Remove ${ticker} from this theme?`)) {
+                const theme = themes.find(t => t.id === themeId);
+                theme.companies = theme.companies.filter(c => c.ticker !== ticker);
+                associations = associations.filter(a => !(a.themeId === themeId && a.ticker === ticker));
+                renderThemeTable();
+            }
+        }
+
+
+        // ========== NAVIGATION ==========
+        
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const view = this.dataset.view;
+                showView(view);
+            });
+        });
+
+        // ========== SEARCH CLEAR FUNCTIONS ==========
+        
+        function clearGradeSearch() {
+            document.getElementById('search-input').value = '';
+            renderABCDFTable();
+        }
+
+        function clearThemeSearch() {
+            document.getElementById('theme-search').value = '';
+            renderThemeTable();
+        }
+
+        // ========== ADD TICKER TO THEME ==========
+        
+        let selectedTickerForTheme = {};
+
+        function showTickerAutocomplete(themeId, searchTerm) {
+            const dropdown = document.getElementById(`autocomplete-${themeId}`);
+            const nameDisplay = document.getElementById(`selected-company-name-${themeId}`);
+            
+            if (!searchTerm) {
+                dropdown.classList.add('hidden');
+                nameDisplay.textContent = '';
+                selectedTickerForTheme[themeId] = null;
+                return;
+            }
+            
+            const matches = companies.filter(c => 
+                c.ticker.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
+                c.name.toLowerCase().includes(searchTerm.toLowerCase())
+            ).slice(0, 10);
+            
+            if (matches.length === 0) {
+                dropdown.classList.add('hidden');
+                nameDisplay.textContent = '';
+                return;
+            }
+            
+            dropdown.innerHTML = matches.map(c => `
+                <div class="autocomplete-item" onclick="selectTickerForTheme(${themeId}, '${c.ticker}', '${c.name.replace(/'/g, "\\'")}')">
+                    <strong>${c.ticker}</strong> - ${c.name}
+                </div>
+            `).join('');
+            
+            dropdown.classList.remove('hidden');
+        }
+
+        function selectTickerForTheme(themeId, ticker, companyName) {
+            document.getElementById(`add-ticker-${themeId}`).value = ticker;
+            document.getElementById(`selected-company-name-${themeId}`).textContent = companyName;
+            document.getElementById(`autocomplete-${themeId}`).classList.add('hidden');
+            selectedTickerForTheme[themeId] = { ticker, name: companyName };
+        }
+
+        function handleAddTickerKeydown(event, themeId) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addTickerToTheme(themeId);
+            }
+        }
+
+        function addTickerToTheme(themeId) {
+            const ticker = document.getElementById(`add-ticker-${themeId}`).value.toUpperCase();
+            const relationship = document.getElementById(`relationship-select-${themeId}`).value;
+            
+            if (!ticker) {
+                alert('Please enter a ticker');
+                return;
+            }
+            
+            const company = companies.find(c => c.ticker === ticker);
+            if (!company) {
+                alert('Ticker not found');
+                return;
+            }
+            
+            const theme = themes.find(t => t.id === themeId);
+            if (!theme) return;
+            
+            // Check if already exists
+            if (theme.companies.find(c => c.ticker === ticker)) {
+                alert('This company is already in this theme');
+                return;
+            }
+            
+            // Add to theme
+            theme.companies.push({
+                ticker: company.ticker,
+                name: company.name,
+                relationship
+            });
+            
+            // Add to associations
+            const stableSince = new Date();
+            associations.push({
+                id: associations.length,
+                ticker: company.ticker,
+                companyName: company.name,
+                themeId: theme.id,
+                themeName: theme.name,
+                relationship,
+                lastChanged: 0,
+                daysInCurrentRelationship: 14,
+                targetRelationship: null,
+                transitionProgress: 0,
+                etaDate: null,
+                stableSinceDate: stableSince,
+                originalRelationship: relationship
+            });
+            
+            // Clear input but keep expansion open
+            document.getElementById(`add-ticker-${themeId}`).value = '';
+            document.getElementById(`selected-company-name-${themeId}`).textContent = '';
+            selectedTickerForTheme[themeId] = null;
+            
+            // Keep this theme expanded and re-render
+            renderThemeTable();
+            
+            // Focus back on input for quick adding
+            setTimeout(() => {
+                document.getElementById(`add-ticker-${themeId}`)?.focus();
+            }, 100);
+        }
+
+        // Close autocomplete when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.add-ticker-row')) {
+                document.querySelectorAll('.autocomplete-dropdown').forEach(d => d.classList.add('hidden'));
+            }
+        });
+
+        // ========== GRADE SELECTION ==========
+        
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('grade-pill') && !e.target.hasAttribute('onclick')) {
+                const row = e.target.closest('.table-row');
+                const ticker = row.querySelector('.ticker').textContent;
+                const grade = e.target.dataset.grade;
+                
+                const company = companies.find(c => c.ticker === ticker);
+                if (company) {
+                    const statusCell = row.querySelector('.status-cell');
+                    const pills = row.querySelectorAll('.grade-pill');
+                    
+                    // If no transition has started (at original, stable)
+                    if (company.targetGrade === null) {
+                        if (grade === company.originalGrade) {
+                            // Clicking same grade when stable - do nothing
+                            return;
+                        }
+                        // Start new transition from original
+                        company.targetGrade = company.originalGrade;
+                        company.grade = grade;
+                        company.lastUpdated = 0;
+                        company.weeksInCurrentGrade = 0;
+                        company.transitionProgress = 0;
+                        
+                        const eta = new Date();
+                        eta.setDate(eta.getDate() + (10 * 7));
+                        company.etaDate = eta;
+                        company.stableSinceDate = new Date();
+                        
+                        pills.forEach(p => p.classList.remove('active'));
+                        e.target.classList.add('active');
+                        
+                        statusCell.innerHTML = `
+                            <div class="status-transitioning">Moving from ${company.targetGrade} to ${grade}</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="status-transitioning">ETA: ${formatDate(eta)}</div>
+                        `;
+                        
+                        row.querySelector('.last-updated').textContent = 'Today';
+                        e.target.style.transform = 'scale(1.2)';
+                        setTimeout(() => e.target.style.transform = '', 200);
+                        updateGradeStats();
+                        return;
+                    }
+                    
+                    // Transition is in progress
+                    if (grade === company.targetGrade) {
+                        // Clicking back to original - invert progress bar
+                        const oldProgress = company.transitionProgress;
+                        const invertedProgress = 100 - oldProgress;
+                        company.grade = grade;
+                        company.transitionProgress = invertedProgress;
+                        // Swap target and destination
+                        const temp = company.targetGrade;
+                        company.targetGrade = company.grade;
+                        company.grade = temp;
+                        
+                        pills.forEach(p => p.classList.remove('active'));
+                        e.target.classList.add('active');
+                        
+                        statusCell.innerHTML = `
+                            <div class="status-transitioning">Moving from ${company.targetGrade} to ${company.grade}</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${invertedProgress}%"></div>
+                            </div>
+                            <div class="status-transitioning">ETA: ${formatDate(company.etaDate)}</div>
+                        `;
+                        
+                        e.target.style.transform = 'scale(1.2)';
+                        setTimeout(() => e.target.style.transform = '', 200);
+                        return;
+                    }
+                    
+                    if (grade === company.grade) {
+                        // Clicking same destination - no change
+                        return;
+                    }
+                    
+                    // Clicking different destination - reset progress
+                    company.grade = grade;
+                    company.lastUpdated = 0;
+                    company.weeksInCurrentGrade = 0;
+                    company.transitionProgress = 0;
+                    
+                    const eta = new Date();
+                    eta.setDate(eta.getDate() + (10 * 7));
+                    company.etaDate = eta;
+                    company.stableSinceDate = new Date();
+                    
+                    pills.forEach(p => p.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    statusCell.innerHTML = `
+                        <div class="status-transitioning">Moving from ${company.targetGrade} to ${grade}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="status-transitioning">ETA: ${formatDate(eta)}</div>
+                    `;
+                    
+                    row.querySelector('.last-updated').textContent = 'Today';
+                    e.target.style.transform = 'scale(1.2)';
+                    setTimeout(() => e.target.style.transform = '', 200);
+                    updateGradeStats();
+                }
+                
+                const pills = row.querySelectorAll('.grade-pill');
+                pills.forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                row.querySelector('.last-updated').textContent = 'Today';
+                
+                e.target.style.transform = 'scale(1.2)';
+                setTimeout(() => e.target.style.transform = '', 200);
+                
+                updateGradeStats();
+            }
+        });
+
+        // ========== CHECKBOX SELECTION ==========
+        
+        document.getElementById('select-all').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            updateBulkActions();
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('row-checkbox')) {
+                updateBulkActions();
+            }
+        });
+
+        function updateBulkActions() {
+            const checked = document.querySelectorAll('.row-checkbox:checked').length;
+            const bulkBar = document.getElementById('bulk-actions');
+            document.getElementById('selected-count').textContent = checked;
+            
+            if (checked > 0) {
+                bulkBar.classList.add('show');
+            } else {
+                bulkBar.classList.remove('show');
+            }
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('select-all').checked = false;
+            updateBulkActions();
+        }
+
+        function bulkSetGrade(grade) {
+            const checkedRows = document.querySelectorAll('.row-checkbox:checked');
+            checkedRows.forEach(checkbox => {
+                const row = checkbox.closest('.table-row');
+                const ticker = row.querySelector('.ticker').textContent;
+                
+                const company = companies.find(c => c.ticker === ticker);
+                if (company) {
+                    company.grade = grade;
+                    company.lastUpdated = 0;
+                    company.targetGrade = null;
+                    company.weeksInCurrentGrade = 0;
+                    company.transitionProgress = 0;
+                }
+                
+                const pills = row.querySelectorAll('.grade-pill');
+                pills.forEach(p => {
+                    p.classList.remove('active');
+                    if (p.dataset.grade === grade) {
+                        p.classList.add('active');
+                    }
+                });
+                
+                const statusCell = row.querySelector('.status-cell');
+                statusCell.innerHTML = `<div class="status-complete">Grade ${grade}</div>`;
+                
+                row.querySelector('.last-updated').textContent = 'Today';
+            });
+            
+            updateGradeStats();
+            clearSelection();
+        }
+
+        // ========== FILTERS ==========
+        
+        document.querySelectorAll('[data-filter]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentGradeFilter = this.dataset.filter;
+                renderABCDFTable();
+            });
+        });
+
+        document.querySelectorAll('[data-theme-filter]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-theme-filter]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentThemeFilter = this.dataset.themeFilter;
+                renderThemeTable();
+            });
+        });
+
+        // ========== SEARCH ==========
+        
+        document.getElementById('search-input').addEventListener('input', function() {
+            const clearBtn = document.getElementById('grade-search-clear');
+            if (this.value) {
+                clearBtn.classList.add('show');
+            } else {
+                clearBtn.classList.remove('show');
+            }
+            renderABCDFTable();
+        });
+
+        document.getElementById('theme-search').addEventListener('input', function() {
+            const clearBtn = document.getElementById('theme-search-clear');
+            if (this.value) {
+                clearBtn.classList.add('show');
+            } else {
+                clearBtn.classList.remove('show');
+            }
+            renderThemeTable();
+        });
+
+        // ========== THEME MODAL ==========
+        
+        function openThemeModal() {
+            document.getElementById('theme-modal-title').textContent = 'Create New Theme';
+            document.getElementById('theme-name-input').value = '';
+            document.getElementById('theme-desc-input').value = '';
+            
+            // Reset strength selector
+            document.querySelectorAll('.strength-option').forEach(o => o.classList.remove('selected'));
+            document.querySelector('[data-strength="0"]').classList.add('selected');
+            
+            // Populate company selector
+            populateCompanySelector();
+            
+            document.getElementById('theme-modal').classList.add('show');
+        }
+
+        function closeThemeModal() {
+            document.getElementById('theme-modal').classList.remove('show');
+        }
+
+        function populateCompanySelector() {
+            const selector = document.getElementById('theme-company-selector');
+            selector.innerHTML = '';
+            
+            const searchTerm = document.getElementById('theme-company-search').value.toLowerCase();
+            
+            const filteredCompanies = companies.filter(c => {
+                if (!searchTerm) return true;
+                return c.ticker.toLowerCase().includes(searchTerm) || 
+                       c.name.toLowerCase().includes(searchTerm);
+            });
+            
+            filteredCompanies.slice(0, 50).forEach(company => {
+                const item = document.createElement('div');
+                item.className = 'company-selector-item';
+                item.innerHTML = `
+                    <label style="display: flex; align-items: center; cursor: pointer; flex: 1;">
+                        <input type="checkbox" class="theme-company-cb" value="${company.ticker}">
+                        <span style="font-weight: 600; margin-right: 8px;">${company.ticker}</span>
+                        <span style="color: #888;">${company.name}</span>
+                    </label>
+                    <select class="relationship-select" style="padding: 4px 8px; background: #1a1a1a; border: 1px solid #333; border-radius: 4px; color: #e0e0e0;">
+                        <option>Strong</option>
+                        <option>Weak</option>
+                    </select>
+                `;
+                selector.appendChild(item);
+            });
+        }
+
+        document.getElementById('theme-company-search').addEventListener('input', populateCompanySelector);
+
+        function saveTheme() {
+            const name = document.getElementById('theme-name-input').value;
+            const desc = document.getElementById('theme-desc-input').value;
+            const strength = parseInt(document.querySelector('.strength-option.selected').dataset.strength);
+            
+            if (!name || !desc) {
+                alert('Please fill in theme name and description');
+                return;
+            }
+            
+            // Get selected companies
+            const selectedCompanies = [];
+            document.querySelectorAll('.theme-company-cb:checked').forEach(cb => {
+                const ticker = cb.value;
+                const company = companies.find(c => c.ticker === ticker);
+                const item = cb.closest('.company-selector-item');
+                const relationship = item.querySelector('.relationship-select').value;
+                
+                selectedCompanies.push({
+                    ticker,
+                    name: company.name,
+                    relationship
+                });
+                
+                // Add to associations
+                associations.push({
+                    id: associations.length,
+                    ticker,
+                    companyName: company.name,
+                    themeId: themes.length,
+                    themeName: name,
+                    relationship,
+                    lastChanged: 0
+                });
+            });
+            
+            themes.push({
+                id: themes.length,
+                name,
+                description: desc,
+                strength,
+                companies: selectedCompanies,
+                lastEdited: 0
+            });
+            
+            closeThemeModal();
+            renderThemeTable();
+        }
+
+        document.querySelectorAll('.strength-option').forEach(opt => {
+            opt.addEventListener('click', function() {
+                document.querySelectorAll('.strength-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        function deleteTheme(id) {
+            if (confirm('Are you sure you want to delete this theme?')) {
+                themes = themes.filter(t => t.id !== id);
+                associations = associations.filter(a => a.themeId !== id);
+                renderThemeTable();
+            }
+        }
+
+        // ========== EXPORT ==========
+        
+        function exportData() {
+            alert('Exporting data to CSV...');
+        }
+
+        // ========== MODAL CLOSE ON OUTSIDE CLICK ==========
+        
+        document.getElementById('theme-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeThemeModal();
+        });
+
+        // ========== THEME DESCRIPTION SAVE ==========
+        
+        let currentThemeIdForDetail = null;
+        
+        function saveThemeDescription() {
+            if (currentThemeIdForDetail === null) return;
+            
+            const theme = themes.find(t => t.id === currentThemeIdForDetail);
+            if (theme) {
+                theme.description = document.getElementById('theme-detail-description').value;
+                theme.lastEdited = 0;
+                document.getElementById('theme-desc-save-btn').style.display = 'none';
+                alert('Description saved!');
+            }
+        }
+
+        // ========== THEME DETAIL ADD COMPANY ==========
+        
+        let selectedTickerForThemeDetail = {};
+        
+        function showThemeDetailAutocomplete(themeId, searchTerm) {
+            const dropdown = document.getElementById(`theme-detail-autocomplete-${themeId}`);
+            const nameDisplay = document.getElementById(`theme-detail-company-name-${themeId}`);
+            
+            if (!searchTerm) {
+                dropdown.classList.add('hidden');
+                nameDisplay.textContent = '';
+                selectedTickerForThemeDetail[themeId] = null;
+                return;
+            }
+            
+            const theme = themes.find(t => t.id === themeId);
+            const existingTickers = theme.companies.map(c => c.ticker);
+            
+            const matches = companies.filter(c => 
+                !existingTickers.includes(c.ticker) &&
+                (c.ticker.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
+                c.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            ).slice(0, 10);
+            
+            if (matches.length === 0) {
+                dropdown.classList.add('hidden');
+                nameDisplay.textContent = '';
+                return;
+            }
+            
+            dropdown.innerHTML = matches.map(c => `
+                <div class="autocomplete-item" onclick="selectTickerForThemeDetail(${themeId}, '${c.ticker}', '${c.name.replace(/'/g, "\\'")}')">
+                    <strong>${c.ticker}</strong> - ${c.name}
+                </div>
+            `).join('');
+            
+            dropdown.classList.remove('hidden');
+        }
+        
+        function selectTickerForThemeDetail(themeId, ticker, companyName) {
+            document.getElementById(`theme-detail-add-ticker-${themeId}`).value = ticker;
+            document.getElementById(`theme-detail-company-name-${themeId}`).textContent = companyName;
+            document.getElementById(`theme-detail-autocomplete-${themeId}`).classList.add('hidden');
+            selectedTickerForThemeDetail[themeId] = { ticker, name: companyName };
+        }
+        
+        function addCompanyToThemeDetail(themeId) {
+            const ticker = document.getElementById(`theme-detail-add-ticker-${themeId}`).value.toUpperCase();
+            const relationship = document.getElementById(`theme-detail-relationship-${themeId}`).value;
+            
+            if (!ticker) {
+                alert('Please enter a ticker');
+                return;
+            }
+            
+            const company = companies.find(c => c.ticker === ticker);
+            if (!company) {
+                alert('Ticker not found');
+                return;
+            }
+            
+            const theme = themes.find(t => t.id === themeId);
+            if (!theme) return;
+            
+            // Check if already exists
+            if (theme.companies.find(c => c.ticker === ticker)) {
+                alert('This company is already in this theme');
+                return;
+            }
+            
+            // Add to theme
+            theme.companies.push({
+                ticker: company.ticker,
+                name: company.name,
+                relationship
+            });
+            
+            // Add to associations
+            const stableSince = new Date();
+            associations.push({
+                id: associations.length,
+                ticker: company.ticker,
+                companyName: company.name,
+                themeId: theme.id,
+                themeName: theme.name,
+                relationship,
+                lastChanged: 0,
+                daysInCurrentRelationship: 14,
+                targetRelationship: null,
+                transitionProgress: 0,
+                etaDate: null,
+                stableSinceDate: stableSince,
+                originalRelationship: relationship
+            });
+            
+            // Re-render
+            viewThemeDetail(themeId);
+        }
+        
+        function removeCompanyFromThemeDetail(themeId, ticker) {
+            if (confirm(`Remove ${ticker} from this theme?`)) {
+                const theme = themes.find(t => t.id === themeId);
+                theme.companies = theme.companies.filter(c => c.ticker !== ticker);
+                associations = associations.filter(a => !(a.themeId === themeId && a.ticker === ticker));
+                viewThemeDetail(themeId);
+            }
+        }
+
+        // ========== COMPANY DETAIL ADD THEME ==========
+        
+        let selectedThemeForCompanyDetail = {};
+        
+        function showCompanyDetailThemeAutocomplete(ticker, searchTerm) {
+            const dropdown = document.getElementById(`company-detail-theme-autocomplete-${ticker}`);
+            
+            if (!searchTerm) {
+                dropdown.classList.add('hidden');
+                selectedThemeForCompanyDetail[ticker] = null;
+                return;
+            }
+            
+            const companyAssocs = associations.filter(a => a.ticker === ticker);
+            const existingThemeIds = companyAssocs.map(a => a.themeId);
+            
+            const matches = themes.filter(t => 
+                !existingThemeIds.includes(t.id) &&
+                t.name.toLowerCase().includes(searchTerm.toLowerCase())
+            ).slice(0, 10);
+            
+            if (matches.length === 0) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+            
+            dropdown.innerHTML = matches.map(t => `
+                <div class="autocomplete-item" onclick="selectThemeForCompanyDetail('${ticker}', ${t.id}, '${t.name.replace(/'/g, "\\'")}')">
+                    <strong>${t.name}</strong>
+                </div>
+            `).join('');
+            
+            dropdown.classList.remove('hidden');
+        }
+        
+        function selectThemeForCompanyDetail(ticker, themeId, themeName) {
+            document.getElementById(`company-detail-add-theme-${ticker}`).value = themeName;
+            document.getElementById(`company-detail-theme-autocomplete-${ticker}`).classList.add('hidden');
+            selectedThemeForCompanyDetail[ticker] = { themeId, name: themeName };
+        }
+        
+        function addThemeToCompanyDetail(ticker) {
+            const selected = selectedThemeForCompanyDetail[ticker];
+            if (!selected) {
+                alert('Please select a theme');
+                return;
+            }
+            
+            const relationship = document.getElementById(`company-detail-relationship-${ticker}`).value;
+            const theme = themes.find(t => t.id === selected.themeId);
+            const company = companies.find(c => c.ticker === ticker);
+            
+            if (!theme || !company) return;
+            
+            // Add to theme
+            theme.companies.push({
+                ticker: company.ticker,
+                name: company.name,
+                relationship
+            });
+            
+            // Add to associations
+            const stableSince = new Date();
+            associations.push({
+                id: associations.length,
+                ticker: company.ticker,
+                companyName: company.name,
+                themeId: theme.id,
+                themeName: theme.name,
+                relationship,
+                lastChanged: 0,
+                daysInCurrentRelationship: 14,
+                targetRelationship: null,
+                transitionProgress: 0,
+                etaDate: null,
+                stableSinceDate: stableSince,
+                originalRelationship: relationship
+            });
+            
+            // Re-render
+            viewCompanyDetail(ticker);
+        }
+
+        // Update viewThemeDetail to track current theme
+        const originalViewThemeDetail = viewThemeDetail;
+        viewThemeDetail = function(themeId) {
+            currentThemeIdForDetail = themeId;
+            originalViewThemeDetail(themeId);
+        };
+
+        // ========== INITIALIZE ==========
+        
+        renderABCDFTable();
+        renderThemeTable();
+    </script>
+</body>
+</html>
