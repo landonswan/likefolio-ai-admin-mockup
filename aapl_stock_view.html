@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAPL - Apple Inc. | LikeFolio.ai</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --bg-card: #15151f;
+            --border: #2a2a3a;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-lime: #84cc16;
+            --accent-yellow: #eab308;
+            --accent-orange: #f97316;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .stock-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .stock-logo {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #1a1a24, #2a2a3a);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .stock-details h1 {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 2px;
+        }
+
+        .stock-details .company-name {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stock-details .company-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            max-width: 320px;
+            line-height: 1.5;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+        }
+
+        .price-section {
+            text-align: right;
+        }
+
+        .current-price {
+            font-size: 42px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -2px;
+        }
+
+        .price-change {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 2px;
+        }
+
+        .price-change-value {
+            font-size: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        .price-change-value.positive { color: var(--accent-green); }
+        .price-change-value.negative { color: var(--accent-red); }
+
+        .price-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Score Summary Row */
+        .score-summary {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: stretch;
+        }
+
+        .score-pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 20px;
+        }
+
+        .score-pill-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-pill-value {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .score-pill-value.cyan { color: var(--accent-cyan); }
+        .score-pill-value.blue { color: var(--accent-blue); }
+        .score-pill-value.green { color: var(--accent-green); }
+        .score-pill-value.purple { color: var(--accent-purple); }
+
+        .score-pill-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Recommendation Section in Summary */
+        .rec-pill {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 24px;
+            margin-left: auto;
+        }
+
+        .rec-pill-info {
+            text-align: right;
+        }
+
+        .rec-pill-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .rec-pill-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .rec-pill-sub span {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .rec-badge {
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .rec-badge.strong-buy {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.25));
+            color: var(--accent-green);
+            border: 2px solid rgba(16, 185, 129, 0.5);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+        }
+
+        .rec-badge.buy {
+            background: linear-gradient(135deg, rgba(132, 204, 22, 0.25), rgba(101, 163, 13, 0.25));
+            color: var(--accent-lime);
+            border: 2px solid rgba(132, 204, 22, 0.5);
+            box-shadow: 0 0 20px rgba(132, 204, 22, 0.12);
+        }
+
+        .rec-badge.neutral {
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(202, 138, 4, 0.25));
+            color: var(--accent-yellow);
+            border: 2px solid rgba(234, 179, 8, 0.5);
+        }
+
+        .rec-badge.sell {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.25), rgba(234, 88, 12, 0.25));
+            color: var(--accent-orange);
+            border: 2px solid rgba(249, 115, 22, 0.5);
+        }
+
+        .rec-badge.strong-sell {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(220, 38, 38, 0.25));
+            color: var(--accent-red);
+            border: 2px solid rgba(239, 68, 68, 0.5);
+        }
+
+        /* Main Chart */
+        .chart-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .legend-line {
+            width: 20px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .legend-line.main-st { background: var(--accent-green); }
+        .legend-line.wall-st { background: var(--accent-blue); }
+        .legend-line.price { background: #ffffff; }
+
+        .chart-controls {
+            display: flex;
+            gap: 6px;
+        }
+
+        .chart-btn {
+            padding: 5px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chart-btn:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .chart-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+
+        .y-axis-left {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 30px;
+            width: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            text-align: right;
+            padding-right: 8px;
+        }
+
+        .y-axis-right {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 30px;
+            width: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-green);
+            text-align: left;
+            padding-left: 8px;
+        }
+
+        .x-axis {
+            position: absolute;
+            left: 50px;
+            right: 60px;
+            bottom: 0;
+            height: 30px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-muted);
+            padding-top: 8px;
+        }
+
+        .chart-area {
+            position: absolute;
+            left: 50px;
+            right: 60px;
+            top: 0;
+            bottom: 30px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Hover tooltip */
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(21, 21, 31, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            z-index: 100;
+            min-width: 180px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .chart-tooltip.visible {
+            opacity: 1;
+        }
+
+        .tooltip-date {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .tooltip-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .tooltip-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .tooltip-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .tooltip-dot.main-st { background: var(--accent-green); }
+        .tooltip-dot.wall-st { background: var(--accent-blue); }
+        .tooltip-dot.price { background: #ffffff; }
+
+        .tooltip-value {
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tooltip-value.green { color: var(--accent-green); }
+        .tooltip-value.blue { color: var(--accent-blue); }
+        .tooltip-value.white { color: #ffffff; }
+
+        /* Hover line */
+        .hover-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+
+        .hover-line.visible {
+            opacity: 1;
+        }
+
+        /* Section Grid */
+        .section-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Card Base */
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-icon {
+            font-size: 18px;
+        }
+
+        /* Theme Insights */
+        .trend-gauge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .trend-gauge-bar {
+            width: 180px;
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, 
+                var(--accent-red) 0%, 
+                var(--accent-orange) 25%, 
+                var(--accent-yellow) 50%, 
+                var(--accent-lime) 75%, 
+                var(--accent-green) 100%
+            );
+            position: relative;
+        }
+
+        .trend-gauge-indicator {
+            position: absolute;
+            top: -4px;
+            width: 20px;
+            height: 20px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            border: 3px solid var(--bg-card);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            transform: translateX(-50%);
+            transition: left 0.3s ease;
+        }
+
+        .trend-gauge-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 180px;
+            position: absolute;
+            top: 16px;
+            left: 0;
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .trend-gauge-wrapper {
+            position: relative;
+            padding-bottom: 24px;
+        }
+
+        .theme-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .theme-column {
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .theme-column-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .theme-column-icon {
+            font-size: 16px;
+        }
+
+        .theme-column-title {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .theme-column-title.positive { color: var(--accent-green); }
+        .theme-column-title.negative { color: var(--accent-red); }
+
+        .theme-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .theme-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .theme-bullet {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .theme-bullet.positive { background: var(--accent-green); }
+        .theme-bullet.negative { background: var(--accent-red); }
+
+        .theme-content {
+            flex: 1;
+        }
+
+        .theme-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .theme-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .theme-strength {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .theme-strength span {
+            font-weight: 600;
+        }
+
+        .theme-strength span.strong { color: var(--text-secondary); }
+        .theme-strength span.weak { color: var(--text-muted); }
+
+        /* News Card */
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .news-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .news-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .news-sentiment {
+            width: 4px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .news-sentiment.positive { background: var(--accent-green); }
+        .news-sentiment.negative { background: var(--accent-red); }
+        .news-sentiment.neutral { background: var(--accent-yellow); }
+
+        .news-content {
+            flex: 1;
+        }
+
+        .news-headline {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .news-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .news-source {
+            font-weight: 500;
+        }
+
+        .news-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .news-tag.positive {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+        }
+
+        .news-tag.negative {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+        }
+
+        .news-tag.neutral {
+            background: rgba(234, 179, 8, 0.15);
+            color: var(--accent-yellow);
+        }
+
+        /* Peer Comparison */
+        .peer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .peer-item {
+            display: grid;
+            grid-template-columns: 80px 1fr 60px 60px 80px;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .peer-item.header {
+            background: transparent;
+            padding: 8px 16px;
+        }
+
+        .peer-item.header span {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .peer-item.current {
+            border: 1px solid var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.08);
+        }
+
+        .peer-ticker {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .peer-sparkline {
+            height: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .peer-sparkline svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .peer-value {
+            font-size: 13px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .peer-value.cyan { color: var(--accent-cyan); }
+        .peer-value.blue { color: var(--accent-blue); }
+
+        .peer-rec {
+            text-align: center;
+        }
+
+        .peer-rec-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .peer-rec-badge.strong-buy {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+        }
+
+        .peer-rec-badge.buy {
+            background: rgba(132, 204, 22, 0.2);
+            color: var(--accent-lime);
+        }
+
+        .peer-rec-badge.neutral {
+            background: rgba(234, 179, 8, 0.2);
+            color: var(--accent-yellow);
+        }
+
+        .peer-rec-badge.sell {
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--accent-orange);
+        }
+
+        /* Earnings Card */
+        .earnings-main {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 20px;
+        }
+
+        .earnings-countdown {
+            flex: 0 0 180px;
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+        }
+
+        .countdown-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .countdown-date {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .countdown-days {
+            font-size: 32px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-cyan);
+        }
+
+        .countdown-days span {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .earnings-estimates {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .estimate-card {
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .estimate-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .estimate-value {
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .estimate-change {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .estimate-change.positive { color: var(--accent-green); }
+        .estimate-change.negative { color: var(--accent-red); }
+
+        .earnings-history {
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .earnings-history-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .history-item {
+            text-align: center;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .history-quarter {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .history-result {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .history-result.beat { color: var(--accent-green); }
+        .history-result.miss { color: var(--accent-red); }
+        .history-result.inline { color: var(--accent-yellow); }
+
+        /* Consumer Insights */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .insight-card {
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .insight-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .insight-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .insight-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .insight-change {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .insight-change.positive { color: var(--accent-green); }
+        .insight-change.negative { color: var(--accent-red); }
+
+        .insight-arrow {
+            font-size: 14px;
+        }
+
+        .insight-detail {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="stock-info">
+                <div class="stock-logo" style="background: #000; padding: 14px;">
+                    <svg viewBox="0 0 170 170" style="width: 40px; height: 40px; fill: #fff;">
+                        <path d="M150.4 130.3c-2.4 5.6-5.3 10.8-8.6 15.6-4.5 6.6-8.2 11.2-11 13.7-4.4 4.1-9.1 6.2-14.1 6.4-3.6 0-7.9-1-13-3.1-5.1-2-9.8-3.1-14.1-3.1-4.5 0-9.4 1-14.5 3.1-5.1 2.1-9.3 3.1-12.4 3.2-4.8.2-9.6-2-14.4-6.5-3-2.7-6.8-7.4-11.3-14.1-4.9-7.2-8.9-15.5-12-25-3.3-10.2-5-20.1-5-29.7 0-11 2.4-20.4 7.1-28.4 3.7-6.4 8.6-11.4 14.8-15.1 6.1-3.7 12.8-5.6 19.9-5.7 3.8 0 8.8 1.2 15.1 3.5 6.2 2.3 10.2 3.5 12 3.5 1.3 0 5.7-1.4 13.1-4.2 7-2.6 12.9-3.7 17.7-3.3 13.1 1.1 22.9 6.3 29.4 15.9-11.7 7.1-17.5 17.1-17.4 29.8.1 9.9 3.7 18.2 10.8 24.7 3.2 3 6.8 5.4 10.8 7.1-.9 2.5-1.8 4.9-2.8 7.2zM119.3 7.6c0 7.8-2.8 15-8.5 21.7-6.8 8-15 12.6-23.9 11.9-.1-1-.2-2-.2-3 0-7.4 3.3-15.4 9.1-21.9 2.9-3.3 6.6-6 11.1-8.2 4.5-2.2 8.7-3.4 12.7-3.6.1 1 .2 2.1.2 3.1z"/>
+                    </svg>
+                </div>
+                <div class="stock-details">
+                    <h1>AAPL</h1>
+                    <div class="company-name">Apple Inc.</div>
+                    <div class="company-desc">Designs and sells smartphones, computers, tablets, wearables, and accessories. Also offers digital content, cloud services, and advertising.</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="price-section">
+                    <div class="current-price">$248.13</div>
+                    <div class="price-change">
+                        <span class="price-change-value positive">+$3.47</span>
+                        <span class="price-change-value positive">(+1.42%)</span>
+                    </div>
+                    <div class="price-meta">Dec 15, 2024 4:00 PM EST</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Score Summary Pills -->
+        <div class="score-summary">
+            <div class="score-pill">
+                <div>
+                    <div class="score-pill-label">Main Street</div>
+                    <div class="score-pill-sub">Consumer & fundamentals</div>
+                </div>
+                <div class="score-pill-value cyan">87.4</div>
+            </div>
+            <div class="score-pill">
+                <div>
+                    <div class="score-pill-label">Wall Street</div>
+                    <div class="score-pill-sub">Investor sentiment</div>
+                </div>
+                <div class="score-pill-value blue">68.5</div>
+            </div>
+            <div class="score-pill">
+                <div>
+                    <div class="score-pill-label">Differential</div>
+                    <div class="score-pill-sub">Main St − Wall St</div>
+                </div>
+                <div class="score-pill-value green">+18.9</div>
+            </div>
+            <div class="rec-pill">
+                <div class="rec-pill-info">
+                    <div class="rec-pill-label">LikeFolio Rec</div>
+                    <div class="rec-pill-sub">Grade <span>A</span> • Score 60</div>
+                </div>
+                <div class="rec-badge buy">BUY</div>
+            </div>
+        </div>
+
+        <!-- Main Chart -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <div class="chart-title" id="chartTitle">Daily Scores & Price (2 Years)</div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-line main-st"></div>
+                        <span>Main Street</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line wall-st"></div>
+                        <span>Wall Street</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line price"></div>
+                        <span>Stock Price</span>
+                    </div>
+                </div>
+                <div class="chart-controls">
+                    <button class="chart-btn" data-period="3m">3M</button>
+                    <button class="chart-btn" data-period="6m">6M</button>
+                    <button class="chart-btn" data-period="1y">1Y</button>
+                    <button class="chart-btn active" data-period="2y">2Y</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="y-axis-left">
+                    <span>100</span>
+                    <span>75</span>
+                    <span>50</span>
+                    <span>25</span>
+                    <span>0</span>
+                </div>
+                <div class="y-axis-right" id="yAxisRight">
+                    <span>$260</span>
+                    <span>$220</span>
+                    <span>$180</span>
+                    <span>$140</span>
+                    <span>$100</span>
+                </div>
+                <div class="x-axis" id="xAxis">
+                    <span>Jan '23</span>
+                    <span>Apr '23</span>
+                    <span>Jul '23</span>
+                    <span>Oct '23</span>
+                    <span>Jan '24</span>
+                    <span>Apr '24</span>
+                    <span>Jul '24</span>
+                    <span>Oct '24</span>
+                    <span>Dec '24</span>
+                </div>
+                <div class="chart-area" id="chartArea">
+                    <div class="hover-line" id="hoverLine"></div>
+                    <svg class="chart-svg" viewBox="0 0 1000 300" preserveAspectRatio="none" id="mainChart">
+                        <defs>
+                            <pattern id="grid" width="125" height="75" patternUnits="userSpaceOnUse">
+                                <path d="M 125 0 L 0 0 0 75" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                            </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)"/>
+                        <polyline id="priceLine" fill="none" stroke="#ffffff" stroke-width="2" stroke-linejoin="round" opacity="0.9"/>
+                        <polyline id="wallStLine" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round"/>
+                        <polyline id="mainStLine" fill="none" stroke="#10b981" stroke-width="2" stroke-linejoin="round"/>
+                        <circle id="mainStHoverDot" r="5" fill="#10b981" opacity="0"/>
+                        <circle id="wallStHoverDot" r="5" fill="#3b82f6" opacity="0"/>
+                        <circle id="priceHoverDot" r="5" fill="#ffffff" opacity="0"/>
+                    </svg>
+                    <div class="chart-tooltip" id="chartTooltip">
+                        <div class="tooltip-date" id="tooltipDate">Dec 15, 2024</div>
+                        <div class="tooltip-row">
+                            <span class="tooltip-label"><span class="tooltip-dot main-st"></span>Main Street</span>
+                            <span class="tooltip-value green" id="tooltipMainSt">87.4</span>
+                        </div>
+                        <div class="tooltip-row">
+                            <span class="tooltip-label"><span class="tooltip-dot wall-st"></span>Wall Street</span>
+                            <span class="tooltip-value blue" id="tooltipWallSt">68.5</span>
+                        </div>
+                        <div class="tooltip-row">
+                            <span class="tooltip-label"><span class="tooltip-dot price"></span>Price</span>
+                            <span class="tooltip-value white" id="tooltipPrice">$248.13</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 1: Trend Influence + Recent News -->
+        <div class="section-grid">
+            <!-- Trend Influence -->
+            <div class="info-card">
+                <div class="card-header" style="flex-direction: column; align-items: stretch;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <span class="card-title"><span class="card-icon">📊</span> Trend Influence</span>
+                    </div>
+                    <div style="display: flex; justify-content: center;">
+                        <div class="trend-gauge">
+                            <div class="trend-gauge-wrapper">
+                                <div class="trend-gauge-bar">
+                                    <div class="trend-gauge-indicator" style="left: 75%;"></div>
+                                </div>
+                                <div class="trend-gauge-labels">
+                                    <span>Negative</span>
+                                    <span>Positive</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="theme-columns">
+                    <div class="theme-column">
+                        <div class="theme-column-header">
+                            <span class="theme-column-icon">📉</span>
+                            <span class="theme-column-title negative">Headwinds</span>
+                        </div>
+                        <div class="theme-list">
+                            <div class="theme-item">
+                                <div class="theme-bullet negative"></div>
+                                <div class="theme-content">
+                                    <div class="theme-name">China Exposure</div>
+                                    <div class="theme-desc">Geopolitical tensions and Huawei competition</div>
+                                    <div class="theme-strength"><span class="strong">Strong</span></div>
+                                </div>
+                            </div>
+                            <div class="theme-item">
+                                <div class="theme-bullet negative"></div>
+                                <div class="theme-content">
+                                    <div class="theme-name">Smartphone Saturation</div>
+                                    <div class="theme-desc">Longer upgrade cycles</div>
+                                    <div class="theme-strength"><span class="weak">Partial</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="theme-column">
+                        <div class="theme-column-header">
+                            <span class="theme-column-icon">📈</span>
+                            <span class="theme-column-title positive">Tailwinds</span>
+                        </div>
+                        <div class="theme-list">
+                            <div class="theme-item">
+                                <div class="theme-bullet positive"></div>
+                                <div class="theme-content">
+                                    <div class="theme-name">AI & Machine Learning</div>
+                                    <div class="theme-desc">Apple Intelligence rollout driving renewed interest</div>
+                                    <div class="theme-strength"><span class="strong">Strong</span></div>
+                                </div>
+                            </div>
+                            <div class="theme-item">
+                                <div class="theme-bullet positive"></div>
+                                <div class="theme-content">
+                                    <div class="theme-name">Premium Consumer</div>
+                                    <div class="theme-desc">Resilient high-end spending</div>
+                                    <div class="theme-strength"><span class="strong">Strong</span></div>
+                                </div>
+                            </div>
+                            <div class="theme-item">
+                                <div class="theme-bullet positive"></div>
+                                <div class="theme-content">
+                                    <div class="theme-name">Wearables Growth</div>
+                                    <div class="theme-desc">Watch and AirPods gaining share</div>
+                                    <div class="theme-strength"><span class="weak">Partial</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent News -->
+            <div class="info-card">
+                <div class="card-header">
+                    <span class="card-title"><span class="card-icon">📰</span> Insights & Catalysts</span>
+                </div>
+                <div class="news-list">
+                    <div class="news-item">
+                        <div class="news-sentiment positive"></div>
+                        <div class="news-content">
+                            <div class="news-headline">Consumer Demand for iPhone 16 Surges: Our Data Shows Strong Holiday Intent</div>
+                            <div class="news-meta">
+                                <span class="news-source">LikeFolio</span>
+                                <span>Dec 14, 2024</span>
+                                <span class="news-tag positive">Bullish</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-sentiment negative"></div>
+                        <div class="news-content">
+                            <div class="news-headline">Huawei's Mate 70 Launch Pressures Apple's China iPhone Sales</div>
+                            <div class="news-meta">
+                                <span class="news-source">Reuters</span>
+                                <span>Dec 12, 2024</span>
+                                <span class="news-tag negative">Bearish</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-sentiment positive"></div>
+                        <div class="news-content">
+                            <div class="news-headline">Apple Watch Mentions Hit All-Time High as Health Features Drive Adoption</div>
+                            <div class="news-meta">
+                                <span class="news-source">LikeFolio</span>
+                                <span>Dec 10, 2024</span>
+                                <span class="news-tag positive">Bullish</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="news-item">
+                        <div class="news-sentiment neutral"></div>
+                        <div class="news-content">
+                            <div class="news-headline">Apple Expands Manufacturing in India Amid Supply Chain Diversification</div>
+                            <div class="news-meta">
+                                <span class="news-source">WSJ</span>
+                                <span>Dec 8, 2024</span>
+                                <span class="news-tag neutral">Neutral</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Peer Comparison + Earnings -->
+        <div class="section-grid">
+            <!-- Peer Comparison -->
+            <div class="info-card">
+                <div class="card-header">
+                    <span class="card-title"><span class="card-icon">⚔️</span> Peer Comparison</span>
+                </div>
+                <div class="peer-list">
+                    <div class="peer-item header">
+                        <span>Ticker</span>
+                        <span>30-Day Trend</span>
+                        <span>Main St</span>
+                        <span>Wall St</span>
+                        <span>LF Rec</span>
+                    </div>
+                    <div class="peer-item current">
+                        <span class="peer-ticker">AAPL</span>
+                        <div class="peer-sparkline">
+                            <svg viewBox="0 0 100 24" preserveAspectRatio="none">
+                                <polyline fill="none" stroke="#06b6d4" stroke-width="2" points="0,20 15,18 30,15 45,16 60,12 75,8 100,5"/>
+                            </svg>
+                        </div>
+                        <span class="peer-value cyan">87.4</span>
+                        <span class="peer-value blue">68.5</span>
+                        <div class="peer-rec"><span class="peer-rec-badge buy">BUY</span></div>
+                    </div>
+                    <div class="peer-item">
+                        <span class="peer-ticker">MSFT</span>
+                        <div class="peer-sparkline">
+                            <svg viewBox="0 0 100 24" preserveAspectRatio="none">
+                                <polyline fill="none" stroke="#10b981" stroke-width="2" points="0,18 15,14 30,16 45,10 60,8 75,6 100,4"/>
+                            </svg>
+                        </div>
+                        <span class="peer-value cyan">91.2</span>
+                        <span class="peer-value blue">72.1</span>
+                        <div class="peer-rec"><span class="peer-rec-badge strong-buy">STRONG BUY</span></div>
+                    </div>
+                    <div class="peer-item">
+                        <span class="peer-ticker">GOOGL</span>
+                        <div class="peer-sparkline">
+                            <svg viewBox="0 0 100 24" preserveAspectRatio="none">
+                                <polyline fill="none" stroke="#eab308" stroke-width="2" points="0,12 15,14 30,10 45,12 60,14 75,12 100,10"/>
+                            </svg>
+                        </div>
+                        <span class="peer-value cyan">78.5</span>
+                        <span class="peer-value blue">65.3</span>
+                        <div class="peer-rec"><span class="peer-rec-badge buy">BUY</span></div>
+                    </div>
+                    <div class="peer-item">
+                        <span class="peer-ticker">AMZN</span>
+                        <div class="peer-sparkline">
+                            <svg viewBox="0 0 100 24" preserveAspectRatio="none">
+                                <polyline fill="none" stroke="#84cc16" stroke-width="2" points="0,16 15,12 30,14 45,10 60,8 75,10 100,6"/>
+                            </svg>
+                        </div>
+                        <span class="peer-value cyan">82.1</span>
+                        <span class="peer-value blue">58.4</span>
+                        <div class="peer-rec"><span class="peer-rec-badge buy">BUY</span></div>
+                    </div>
+                    <div class="peer-item">
+                        <span class="peer-ticker">META</span>
+                        <div class="peer-sparkline">
+                            <svg viewBox="0 0 100 24" preserveAspectRatio="none">
+                                <polyline fill="none" stroke="#f97316" stroke-width="2" points="0,8 15,10 30,12 45,14 60,12 75,16 100,14"/>
+                            </svg>
+                        </div>
+                        <span class="peer-value cyan">71.8</span>
+                        <span class="peer-value blue">74.2</span>
+                        <div class="peer-rec"><span class="peer-rec-badge neutral">NEUTRAL</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Earnings Calendar -->
+            <div class="info-card">
+                <div class="card-header">
+                    <span class="card-title"><span class="card-icon">📅</span> Earnings Calendar</span>
+                </div>
+                <div class="earnings-main">
+                    <div class="earnings-countdown">
+                        <div class="countdown-label">Next Report</div>
+                        <div class="countdown-date">Jan 30, 2025</div>
+                        <div class="countdown-days">46 <span>days</span></div>
+                    </div>
+                    <div class="earnings-estimates">
+                        <div class="estimate-card">
+                            <div class="estimate-label">Est. Revenue</div>
+                            <div class="estimate-value">$124.1B</div>
+                            <div class="estimate-change positive">↑ +4.2% YoY</div>
+                        </div>
+                        <div class="estimate-card">
+                            <div class="estimate-label">Est. EPS</div>
+                            <div class="estimate-value">$2.35</div>
+                            <div class="estimate-change positive">↑ +7.8% YoY</div>
+                        </div>
+                        <div class="estimate-card">
+                            <div class="estimate-label">Analyst Target</div>
+                            <div class="estimate-value">$265</div>
+                            <div class="estimate-change positive">+6.8% upside</div>
+                        </div>
+                        <div class="estimate-card">
+                            <div class="estimate-label">Analyst Rating</div>
+                            <div class="estimate-value">4.2/5</div>
+                            <div class="estimate-change">42 Buy, 8 Hold</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="earnings-history">
+                    <div class="earnings-history-title">Last 4 Quarters</div>
+                    <div class="history-grid">
+                        <div class="history-item">
+                            <div class="history-quarter">Q4 '24</div>
+                            <div class="history-result beat">Beat +3.2%</div>
+                        </div>
+                        <div class="history-item">
+                            <div class="history-quarter">Q3 '24</div>
+                            <div class="history-result beat">Beat +5.1%</div>
+                        </div>
+                        <div class="history-item">
+                            <div class="history-quarter">Q2 '24</div>
+                            <div class="history-result beat">Beat +1.8%</div>
+                        </div>
+                        <div class="history-item">
+                            <div class="history-quarter">Q1 '24</div>
+                            <div class="history-result inline">In Line</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 3: Consumer Insights -->
+        <div class="info-card">
+            <div class="card-header">
+                <span class="card-title"><span class="card-icon">🛒</span> Consumer Insights</span>
+            </div>
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <div class="insight-icon">📱</div>
+                    <div class="insight-title">iPhone Mentions</div>
+                    <div class="insight-value">2.4M</div>
+                    <div class="insight-change positive">
+                        <span class="insight-arrow">↑</span> +23% vs last month
+                    </div>
+                    <div class="insight-detail">Social buzz around iPhone 16 Pro Max remains elevated, particularly around camera features and Apple Intelligence.</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-icon">🏪</div>
+                    <div class="insight-title">Store Traffic</div>
+                    <div class="insight-value">Strong</div>
+                    <div class="insight-change positive">
+                        <span class="insight-arrow">↑</span> +12% YoY
+                    </div>
+                    <div class="insight-detail">Apple Store foot traffic showing resilience in Q4, particularly in premium malls and flagship locations.</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-icon">⌚</div>
+                    <div class="insight-title">Wearables Demand</div>
+                    <div class="insight-value">Growing</div>
+                    <div class="insight-change positive">
+                        <span class="insight-arrow">↑</span> +8% QoQ
+                    </div>
+                    <div class="insight-detail">Apple Watch Ultra 2 and AirPods Pro mentions trending up. Health features driving interest among older demographics.</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-icon">💳</div>
+                    <div class="insight-title">Purchase Intent</div>
+                    <div class="insight-value">High</div>
+                    <div class="insight-change positive">
+                        <span class="insight-arrow">↑</span> Above average
+                    </div>
+                    <div class="insight-detail">"Buying iPhone" and "upgrading to iPhone" phrases up 31% in consumer discussions. Holiday gift intent strong.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>LikeFolio.ai Mock View • Data is simulated for demonstration • <a href="formula_calculator.html">Calculator</a> • <a href="admin_mockup.html">Admin</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Generate 2 years of DAILY data (~500 trading days)
+        const totalDays = 500;
+        
+        function generateDailyData() {
+            const data = {
+                mainSt: [],
+                wallSt: [],
+                price: [],
+                dates: []
+            };
+            
+            let mainSt = 62;
+            let wallSt = 52;
+            let price = 130;
+            
+            const startDate = new Date('2023-01-03');
+            
+            for (let i = 0; i < totalDays; i++) {
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + Math.floor(i * 1.4));
+                data.dates.push(currentDate);
+                
+                const dailyNoise = () => (Math.random() - 0.5) * 2;
+                
+                mainSt += dailyNoise() * 1.5;
+                if (i > 100 && i < 130) mainSt -= 0.15;
+                if (i > 200 && i < 250) mainSt += 0.1;
+                if (i > 350) mainSt += 0.08;
+                mainSt = Math.max(45, Math.min(95, mainSt));
+                
+                wallSt += dailyNoise() * 2;
+                if (i > 80 && i < 120) wallSt += 0.2;
+                if (i > 180 && i < 220) wallSt -= 0.15;
+                if (i > 400) wallSt += 0.12;
+                wallSt = Math.max(35, Math.min(85, wallSt));
+                
+                price += dailyNoise() * 3;
+                if (i > 100 && i < 140) price -= 0.4;
+                if (i > 250) price += 0.25;
+                if (i > 400) price += 0.35;
+                price = Math.max(120, Math.min(260, price));
+                
+                data.mainSt.push(mainSt);
+                data.wallSt.push(wallSt);
+                data.price.push(price);
+            }
+            
+            data.mainSt[totalDays - 1] = 87.4;
+            data.wallSt[totalDays - 1] = 68.5;
+            data.price[totalDays - 1] = 248.13;
+            data.dates[totalDays - 1] = new Date('2024-12-15');
+            
+            return data;
+        }
+        
+        const fullData = generateDailyData();
+        let currentPeriod = '2y';
+        let visibleData = { ...fullData };
+        
+        const mainChartHeight = 300;
+        
+        const periods = {
+            '3m': { days: 63, title: '3 Months' },
+            '6m': { days: 126, title: '6 Months' },
+            '1y': { days: 252, title: '1 Year' },
+            '2y': { days: 500, title: '2 Years' }
+        };
+        
+        function getVisibleData(period) {
+            const config = periods[period];
+            const startIdx = Math.max(0, totalDays - config.days);
+            return {
+                mainSt: fullData.mainSt.slice(startIdx),
+                wallSt: fullData.wallSt.slice(startIdx),
+                price: fullData.price.slice(startIdx),
+                dates: fullData.dates.slice(startIdx),
+                startIndex: startIdx
+            };
+        }
+        
+        function dataToPoints(arr, minVal, maxVal, chartHeight) {
+            return arr.map((val, i) => {
+                const x = (i / (arr.length - 1)) * 1000;
+                const y = chartHeight - ((val - minVal) / (maxVal - minVal)) * chartHeight;
+                return `${x},${y}`;
+            }).join(' ');
+        }
+        
+        function formatDate(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+        }
+        
+        function formatShortDate(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return `${months[date.getMonth()]} '${String(date.getFullYear()).slice(2)}`;
+        }
+        
+        function getValueY(val, minVal, maxVal, chartHeight) {
+            return chartHeight - ((val - minVal) / (maxVal - minVal)) * chartHeight;
+        }
+        
+        function updateChart(period) {
+            currentPeriod = period;
+            const data = getVisibleData(period);
+            visibleData = data;
+            
+            const minPrice = Math.floor(Math.min(...data.price) / 20) * 20;
+            const maxPrice = Math.ceil(Math.max(...data.price) / 20) * 20;
+            
+            document.getElementById('mainStLine').setAttribute('points', dataToPoints(data.mainSt, 0, 100, mainChartHeight));
+            document.getElementById('wallStLine').setAttribute('points', dataToPoints(data.wallSt, 0, 100, mainChartHeight));
+            document.getElementById('priceLine').setAttribute('points', dataToPoints(data.price, minPrice, maxPrice, mainChartHeight));
+            
+            document.getElementById('chartTitle').textContent = `Daily Scores & Price (${periods[period].title})`;
+            
+            const priceRange = maxPrice - minPrice;
+            document.getElementById('yAxisRight').innerHTML = `
+                <span>$${maxPrice}</span>
+                <span>$${Math.round(minPrice + priceRange * 0.75)}</span>
+                <span>$${Math.round(minPrice + priceRange * 0.5)}</span>
+                <span>$${Math.round(minPrice + priceRange * 0.25)}</span>
+                <span>$${minPrice}</span>
+            `;
+            
+            const numLabels = 9;
+            const labels = [];
+            for (let i = 0; i < numLabels; i++) {
+                const idx = Math.floor((i / (numLabels - 1)) * (data.dates.length - 1));
+                labels.push(`<span>${formatShortDate(data.dates[idx])}</span>`);
+            }
+            document.getElementById('xAxis').innerHTML = labels.join('');
+            
+            document.querySelectorAll('.chart-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.period === period);
+            });
+            
+            visibleData.minPrice = minPrice;
+            visibleData.maxPrice = maxPrice;
+        }
+        
+        updateChart('2y');
+        
+        document.querySelectorAll('.chart-btn').forEach(btn => {
+            btn.addEventListener('click', () => updateChart(btn.dataset.period));
+        });
+        
+        const chartArea = document.getElementById('chartArea');
+        const hoverLine = document.getElementById('hoverLine');
+        const tooltip = document.getElementById('chartTooltip');
+        const mainStHoverDot = document.getElementById('mainStHoverDot');
+        const wallStHoverDot = document.getElementById('wallStHoverDot');
+        const priceHoverDot = document.getElementById('priceHoverDot');
+        
+        chartArea.addEventListener('mousemove', (e) => {
+            const rect = chartArea.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const width = rect.width;
+            
+            const numPoints = visibleData.mainSt.length;
+            const dataIndex = Math.min(Math.max(0, Math.round((x / width) * (numPoints - 1))), numPoints - 1);
+            
+            hoverLine.style.left = `${x}px`;
+            hoverLine.classList.add('visible');
+            
+            document.getElementById('tooltipDate').textContent = formatDate(visibleData.dates[dataIndex]);
+            document.getElementById('tooltipMainSt').textContent = visibleData.mainSt[dataIndex].toFixed(1);
+            document.getElementById('tooltipWallSt').textContent = visibleData.wallSt[dataIndex].toFixed(1);
+            document.getElementById('tooltipPrice').textContent = '$' + visibleData.price[dataIndex].toFixed(2);
+            
+            let tooltipX = x + 20;
+            let tooltipY = e.clientY - rect.top - 60;
+            
+            if (tooltipX + 200 > width) tooltipX = x - 200;
+            if (tooltipY < 10) tooltipY = 10;
+            if (tooltipY + 120 > rect.height) tooltipY = rect.height - 120;
+            
+            tooltip.style.left = `${tooltipX}px`;
+            tooltip.style.top = `${tooltipY}px`;
+            tooltip.classList.add('visible');
+            
+            const svgX = (dataIndex / (numPoints - 1)) * 1000;
+            const mainStY = getValueY(visibleData.mainSt[dataIndex], 0, 100, mainChartHeight);
+            const wallStY = getValueY(visibleData.wallSt[dataIndex], 0, 100, mainChartHeight);
+            const priceY = getValueY(visibleData.price[dataIndex], visibleData.minPrice, visibleData.maxPrice, mainChartHeight);
+            
+            mainStHoverDot.setAttribute('cx', svgX);
+            mainStHoverDot.setAttribute('cy', mainStY);
+            mainStHoverDot.setAttribute('opacity', 1);
+            
+            wallStHoverDot.setAttribute('cx', svgX);
+            wallStHoverDot.setAttribute('cy', wallStY);
+            wallStHoverDot.setAttribute('opacity', 1);
+            
+            priceHoverDot.setAttribute('cx', svgX);
+            priceHoverDot.setAttribute('cy', priceY);
+            priceHoverDot.setAttribute('opacity', 1);
+        });
+        
+        chartArea.addEventListener('mouseleave', () => {
+            hoverLine.classList.remove('visible');
+            tooltip.classList.remove('visible');
+            mainStHoverDot.setAttribute('opacity', 0);
+            wallStHoverDot.setAttribute('opacity', 0);
+            priceHoverDot.setAttribute('opacity', 0);
+        });
+    </script>
+</body>
+</html>
