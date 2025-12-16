@@ -205,10 +205,13 @@
         }
 
         .rec-pill-label {
-            font-size: 11px;
-            color: var(--text-muted);
+            /* Important label: make it prominent without competing with the BUY badge */
+            font-size: 14px;
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-weight: 700;
+            line-height: 1.15;
         }
 
         .rec-pill-sub {
@@ -1679,8 +1682,7 @@
             </div>
             <div class="rec-pill">
                 <div class="rec-pill-info">
-                    <div class="rec-pill-label">LikeFolio Rec</div>
-                    <div class="rec-pill-sub">Grade <span>A</span> • Score 60</div>
+                    <div class="rec-pill-label">LikeFolio<br>Recommendation</div>
                 </div>
                 <div class="rec-badge buy">BUY</div>
             </div>
