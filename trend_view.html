@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trend View - GLP-1 Economy | LikeFolio.ai</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --bg-card: #15151f;
+            --border: #2a2a3a;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-lime: #84cc16;
+            --accent-yellow: #eab308;
+            --accent-orange: #f97316;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 26px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== Hover icons (reuse pattern from stock view) ===== */
+        .card-hover-icons {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .info-card:hover .card-hover-icons,
+        .hero:hover .card-hover-icons {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .hover-icon-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(26, 26, 36, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #a0a0b0;
+        }
+
+        .hover-icon-btn:hover {
+            background: rgba(42, 42, 58, 1);
+            border-color: #606070;
+            color: #ffffff;
+        }
+
+        .share-icon-img {
+            width: 18px;
+            height: 18px;
+            filter: invert(70%) sepia(0%) saturate(0%) brightness(100%);
+            transition: filter 0.2s;
+        }
+
+        .hover-icon-btn.share-btn:hover .share-icon-img {
+            filter: invert(100%) sepia(0%) saturate(0%) brightness(100%);
+        }
+
+        .hover-icon-btn.ai-btn {
+            filter: grayscale(100%);
+            opacity: 0.85;
+            font-size: 16px;
+        }
+
+        .hover-icon-btn.ai-btn:hover {
+            filter: none;
+            opacity: 1;
+        }
+
+        /* ===== Hero ===== */
+        .hero {
+            position: relative;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            overflow: hidden;
+            background: var(--bg-card);
+            margin-bottom: 18px;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(10,10,15,0.20) 0%, rgba(10,10,15,0.85) 55%, rgba(10,10,15,0.95) 100%),
+                url("https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=1600&q=80");
+            background-size: cover;
+            background-position: center;
+            filter: saturate(1.05) contrast(1.05);
+        }
+
+        .hero-content {
+            position: relative;
+            padding: 26px 26px 22px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .hero-topline {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            height: 22px;
+            padding: 0 10px;
+            border-radius: 999px;
+            background: rgba(59, 130, 246, 0.22);
+            color: #cfe0ff;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .updated {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .hero-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .hero-title h1 {
+            font-size: 44px;
+            letter-spacing: -1px;
+            line-height: 1.05;
+        }
+
+        .sparkle {
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(26, 26, 36, 0.6);
+            font-size: 16px;
+        }
+
+        .hero-desc {
+            max-width: 720px;
+            color: rgba(240,240,245,0.86);
+            font-size: 16px;
+            line-height: 1.65;
+        }
+
+        .hero-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: start;
+            gap: 10px;
+        }
+
+        .share-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(26, 26, 36, 0.55);
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .share-pill:hover {
+            border-color: rgba(255,255,255,0.18);
+            background: rgba(26, 26, 36, 0.70);
+        }
+
+        /* ===== Two column lists ===== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .info-card {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .section-title.positive { color: var(--accent-green); }
+        .section-title.negative { color: var(--accent-red); }
+
+        .company-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .company-row {
+            position: relative;
+            display: grid;
+            grid-template-columns: 44px 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(26, 26, 36, 0.55);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .company-row:hover {
+            border-color: rgba(255,255,255,0.12);
+            background: rgba(26, 26, 36, 0.70);
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            background: rgba(10,10,15,0.55);
+            border: 1px solid rgba(255,255,255,0.10);
+        }
+
+        .row-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .row-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .ticker {
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+
+        .rec-chip {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .rec-chip.strong-buy { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+        .rec-chip.buy { background: rgba(132, 204, 22, 0.2); color: var(--accent-lime); }
+        .rec-chip.neutral { background: rgba(234, 179, 8, 0.2); color: var(--accent-yellow); }
+        .rec-chip.sell { background: rgba(239, 68, 68, 0.18); color: var(--accent-red); }
+
+        .company-name {
+            font-size: 12px;
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .row-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .mini-labels {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            align-items: flex-end;
+        }
+
+        .mini-head {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .mini-values {
+            display: flex;
+            gap: 16px;
+            align-items: baseline;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+        }
+
+        .mini-values .main { color: var(--accent-green); }
+        .mini-values .wall { color: var(--accent-blue); }
+
+        /* ===== Ask LikeFolio ===== */
+        .ask {
+            background: rgba(18, 18, 26, 0.75);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 18px;
+        }
+
+        .ask-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        .ask-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .ask-q {
+            background: rgba(26, 26, 36, 0.55);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .ask-q:hover {
+            background: rgba(26, 26, 36, 0.70);
+            border-color: rgba(255,255,255,0.14);
+        }
+
+        .ask-ico {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(10,10,15,0.55);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .ask-text {
+            font-size: 13px;
+            color: rgba(240,240,245,0.88);
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        /* ===== Modals (same basic behavior as stock view) ===== */
+        .share-modal-overlay,
+        .ai-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .share-modal-overlay.visible,
+        .ai-modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal {
+            width: min(560px, 100%);
+            background: rgba(18, 18, 26, 0.98);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .modal-title {
+            font-weight: 800;
+            letter-spacing: 0.2px;
+        }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(26, 26, 36, 0.8);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .modal-close:hover {
+            border-color: rgba(255,255,255,0.18);
+        }
+
+        .modal-body {
+            padding: 16px;
+            color: rgba(240,240,245,0.88);
+            line-height: 1.55;
+            font-size: 14px;
+        }
+
+        .share-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .share-action {
+            padding: 12px 12px;
+            border-radius: 12px;
+            background: rgba(26, 26, 36, 0.7);
+            border: 1px solid rgba(255,255,255,0.10);
+            cursor: pointer;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            font-weight: 700;
+        }
+
+        .share-action:hover { border-color: rgba(255,255,255,0.16); }
+
+        @media (max-width: 980px) {
+            .hero-content { grid-template-columns: 1fr; }
+            .two-col { grid-template-columns: 1fr; }
+            .ask-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 520px) {
+            .ask-grid { grid-template-columns: 1fr; }
+            .hero-title h1 { font-size: 34px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="container">
+
+        <!-- HERO (no trend score) -->
+        <div class="hero">
+            <div class="card-hover-icons">
+                <button class="hover-icon-btn share-btn" onclick="openShareModal('Trend Overview')" title="Share">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='18' cy='5' r='3'/%3E%3Ccircle cx='6' cy='12' r='3'/%3E%3Ccircle cx='18' cy='19' r='3'/%3E%3Cline x1='8.59' y1='13.51' x2='15.42' y2='17.49'/%3E%3Cline x1='15.41' y1='6.51' x2='8.59' y2='10.49'/%3E%3C/svg%3E"
+                         alt="Share" class="share-icon-img">
+                </button>
+                <button class="hover-icon-btn ai-btn" onclick="openAIModal('hero')" title="Explain with AI">✦</button>
+            </div>
+            <div class="hero-bg"></div>
+            <div class="hero-content">
+                <div>
+                    <div class="hero-topline">
+                        <span class="tag">Macro Trend</span>
+                        <span class="updated">Updated 12/16/2025</span>
+                    </div>
+                    <div class="hero-title">
+                        <h1>GLP-1 Economy</h1>
+                        <span class="sparkle">✦</span>
+                    </div>
+                    <div class="hero-desc">
+                        Purchase intent for snack foods and soda is showing early signs of weakness in demographics with high GLP-1 usage.
+                        Conversely, activewear brands are seeing a “resizing” boom.
+                    </div>
+                </div>
+                <div class="hero-actions">
+                    <div class="share-pill" onclick="openShareModal('Trend Overview')">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='18' cy='5' r='3'/%3E%3Ccircle cx='6' cy='12' r='3'/%3E%3Ccircle cx='18' cy='19' r='3'/%3E%3Cline x1='8.59' y1='13.51' x2='15.42' y2='17.49'/%3E%3Cline x1='15.41' y1='6.51' x2='8.59' y2='10.49'/%3E%3C/svg%3E"
+                             alt="Share" class="share-icon-img">
+                        <span>Share</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New: Retail modules -->
+        <div class="two-col" style="margin-bottom: 18px;">
+            <!-- Trend Drivers -->
+            <div class="info-card">
+                <div class="card-hover-icons">
+                    <button class="hover-icon-btn share-btn" onclick="openShareModal('Trend Drivers')" title="Share">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='18' cy='5' r='3'/%3E%3Ccircle cx='6' cy='12' r='3'/%3E%3Ccircle cx='18' cy='19' r='3'/%3E%3Cline x1='8.59' y1='13.51' x2='15.42' y2='17.49'/%3E%3Cline x1='15.41' y1='6.51' x2='8.59' y2='10.49'/%3E%3C/svg%3E"
+                             alt="Share" class="share-icon-img">
+                    </button>
+                    <button class="hover-icon-btn ai-btn" onclick="openAIModal('drivers')" title="Explain with AI">✦</button>
+                </div>
+                <div class="section-title" style="color: var(--text-primary);">Trend Drivers</div>
+                <div style="display:flex; flex-direction:column; gap:10px; color: rgba(240,240,245,0.88); line-height:1.55; font-size:14px;">
+                    <div>• <strong>Appetite suppression</strong> shifts spend away from high‑calorie snacks/soda.</div>
+                    <div>• <strong>Weight loss momentum</strong> lifts fitness + activewear demand (“resizing”).</div>
+                    <div>• <strong>Access + adherence</strong> expands the addressable population over time.</div>
+                </div>
+            </div>
+
+            <!-- What Changed Recently -->
+            <div class="info-card">
+                <div class="card-hover-icons">
+                    <button class="hover-icon-btn share-btn" onclick="openShareModal('What Changed Recently')" title="Share">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='18' cy='5' r='3'/%3E%3Ccircle cx='6' cy='12' r='3'/%3E%3Ccircle cx='18' cy='19' r='3'/%3E%3Cline x1='8.59' y1='13.51' x2='15.42' y2='17.49'/%3E%3Cline x1='15.41' y1='6.51' x2='8.59' y2='10.49'/%3E%3C/svg%3E"
+                             alt="Share" class="share-icon-img">
+                    </button>
+                    <button class="hover-icon-btn ai-btn" onclick="openAIModal('changed')" title="Explain with AI">✦</button>
+                </div>
+                <div class="section-title" style="color: var(--text-primary);">What Changed Recently</div>
+                <div style="display:flex; flex-direction:column; gap:10px; color: rgba(240,240,245,0.88); line-height:1.55; font-size:14px;">
+                    <div>• <strong>Snack + soda intent</strong> down in GLP‑1 heavy demos (early weakness signal).</div>
+                    <div>• <strong>Activewear interest</strong> up as consumers “resize” wardrobes after weight loss.</div>
+                    <div>• <strong>QSR mix</strong> shifting toward smaller portions + protein-forward options.</div>
+                    <div style="color: var(--text-muted); font-size:12px;">demo copy--this box could be powered by ai</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ask LikeFolio.ai -->
+        <div class="ask" style="margin-bottom: 18px;">
+            <div class="ask-title">Ask LikeFolio.ai about GLP-1 Economy</div>
+            <div class="ask-grid">
+                <div class="ask-q" onclick="openAIModal('q1')">
+                    <div class="ask-ico">📉</div>
+                    <div class="ask-text">Which snack foods are most at risk?</div>
+                </div>
+                <div class="ask-q" onclick="openAIModal('q2')">
+                    <div class="ask-ico">💉</div>
+                    <div class="ask-text">Eli Lilly vs Novo Nordisk pipelines</div>
+                </div>
+                <div class="ask-q" onclick="openAIModal('q3')">
+                    <div class="ask-ico">👕</div>
+                    <div class="ask-text">Impact on apparel sizing and sales</div>
+                </div>
+                <div class="ask-q" onclick="openAIModal('q4')">
+                    <div class="ask-ico">🏋️</div>
+                    <div class="ask-text">Long-term gym membership trends</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <!-- Beneficiaries -->
+            <div class="info-card">
+                <div class="card-hover-icons">
+                    <button class="hover-icon-btn share-btn" onclick="openShareModal('Beneficiaries (Tailwinds)')" title="Share">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='18' cy='5' r='3'/%3E%3Ccircle cx='6' cy='12' r='3'/%3E%3Ccircle cx='18' cy='19' r='3'/%3E%3Cline x1='8.59' y1='13.51' x2='15.42' y2='17.49'/%3E%3Cline x1='15.41' y1='6.51' x2='8.59' y2='10.49'/%3E%3C/svg%3E"
+                             alt="Share" class="share-icon-img">
+                    </button>
+                    <button class="hover-icon-btn ai-btn" onclick="openAIModal('beneficiaries')" title="Explain with AI">✦</button>
+                </div>
+                <div class="section-title positive">Beneficiaries (Tailwinds)</div>
+                <div class="company-list">
+                    <div class="company-row">
+                        <div class="logo">LL</div>
+                        <div class="row-main">
+                            <div class="row-top">
+                                <span class="ticker">LLY</span>
+                                <span class="rec-chip strong-buy">STRONG BUY</span>
+                            </div>
+                            <div class="company-name">Eli Lilly</div>
+                        </div>
+                        <div class="row-right">
+                            <div class="mini-labels">
+                                <div class="mini-head">Main St &nbsp;&nbsp; Wall St</div>
+                                <div class="mini-values"><span class="main">98</span><span class="wall">95</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="company-row">
+                        <div class="logo">NV</div>
+                        <div class="row-main">
+                            <div class="row-top">
+                                <span class="ticker">NVO</span>
+                                <span class="rec-chip strong-buy">STRONG BUY</span>
+                            </div>
+                            <div class="company-name">Novo Nordisk</div>
+                        </div>
+                        <div class="row-right">
+                            <div class="mini-labels">
+                                <div class="mini-head">Main St &nbsp;&nbsp; Wall St</div>
+                                <div class="mini-values"><span class="main">96</span><span class="wall">94</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="company-row">
+                        <div class="logo">DE</div>
+                        <div class="row-main">
+                            <div class="row-top">
+                                <span class="ticker">DECK</span>
+                                <span class="rec-chip buy">BUY</span>
+                            </div>
+                            <div class="company-name">Deckers (Hoka)</div>
+                        </div>
+                        <div class="row-right">
+                            <div class="mini-labels">
+                                <div class="mini-head">Main St &nbsp;&nbsp; Wall St</div>
+                                <div class="mini-values"><span class="main">90</span><span class="wall">85</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="company-row">
+                        <div class="logo">LU</div>
+                        <div class="row-main">
+                            <div class="row-top">
+                                <span class="ticker">LULU</span>
+                                <span class="rec-chip neutral">HOLD</span>
+                            </div>
+                            <div class="company-name">Lululemon</div>
+                        </div>
+                        <div class="row-right">
+                            <div class="mini-labels">
+                                <div class="mini-head">Main St &nbsp;&nbsp; Wall St</div>
+                                <div class="mini-values"><span class="main">65</span><span class="wall">60</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="company-row">
+                        <div class="logo">ON</div>
+                        <div class="row-main">
+                            <div class="row-top">
+                                <span class="ticker">ONON</span>
+                                <span class="rec-chip buy">BUY</span>
+                            </div>
+                            <div class="company-name">On Holding</div>
+                        </div>
+                        <div class="row-right">
+                            <div class="mini-labels">
+                                <div class="mini-head">Main St &nbsp;&nbsp; Wall St</div>
+                                <div class="mini-values"><span class="main">88</span><span class="wall">80</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- At Risk -->
+            <div class="info-card">
+                <div class="card-hover-icons">
+                    <button class="hover-icon-btn share-btn" onclick="openShareModal('At Risk (Headwinds)')" title="Share">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='18' cy='5' r='3'/%3E%3Ccircle cx='6' cy='12' r='3'/%3E%3Ccircle cx='18' cy='19' r='3'/%3E%3Cline x1='8.59' y1='13.51' x2='15.42' y2='17.49'/%3E%3Cline x1='15.41' y1='6.51' x2='8.59' y2='10.49'/%3E%3C/svg%3E"
+                             alt="Share" class="share-icon-img">
+                    </button>
+                    <button class="hover-icon-btn ai-btn" onclick="openAIModal('risk')" title="Explain with AI">✦</button>
+                </div>
+                <div class="section-title negative">At Risk (Headwinds)</div>
+                <div class="company-list">
+                    <div class="company-row">
+                        <div class="logo">PE</div>
+                        <div class="row-main">
+                            <div class="row-top">
+                                <span class="ticker">PEP</span>
+                                <span class="rec-chip sell">SELL</span>
+                            </div>
+                            <div class="company-name">PepsiCo</div>
+                        </div>
+                        <div class="row-right">
+                            <div class="mini-labels">
+                                <div class="mini-head">Main St &nbsp;&nbsp; Wall St</div>
+                                <div class="mini-values"><span class="main">40</span><span class="wall">55</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="company-row">
+                        <div class="logo">MC</div>
+                        <div class="row-main">
+                            <div class="row-top">
+                                <span class="ticker">MCD</span>
+                                <span class="rec-chip neutral">HOLD</span>
+                            </div>
+                            <div class="company-name">McDonald's</div>
+                        </div>
+                        <div class="row-right">
+                            <div class="mini-labels">
+                                <div class="mini-head">Main St &nbsp;&nbsp; Wall St</div>
+                                <div class="mini-values"><span class="main">45</span><span class="wall">60</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="company-row">
+                        <div class="logo">HS</div>
+                        <div class="row-main">
+                            <div class="row-top">
+                                <span class="ticker">HSY</span>
+                                <span class="rec-chip sell">SELL</span>
+                            </div>
+                            <div class="company-name">Hershey</div>
+                        </div>
+                        <div class="row-right">
+                            <div class="mini-labels">
+                                <div class="mini-head">Main St &nbsp;&nbsp; Wall St</div>
+                                <div class="mini-values"><span class="main">35</span><span class="wall">45</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="company-row">
+                        <div class="logo">KO</div>
+                        <div class="row-main">
+                            <div class="row-top">
+                                <span class="ticker">KO</span>
+                                <span class="rec-chip neutral">HOLD</span>
+                            </div>
+                            <div class="company-name">Coca-Cola</div>
+                        </div>
+                        <div class="row-right">
+                            <div class="mini-labels">
+                                <div class="mini-head">Main St &nbsp;&nbsp; Wall St</div>
+                                <div class="mini-values"><span class="main">50</span><span class="wall">65</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="company-row">
+                        <div class="logo">GI</div>
+                        <div class="row-main">
+                            <div class="row-top">
+                                <span class="ticker">GIS</span>
+                                <span class="rec-chip sell">SELL</span>
+                            </div>
+                            <div class="company-name">General Mills</div>
+                        </div>
+                        <div class="row-right">
+                            <div class="mini-labels">
+                                <div class="mini-head">Main St &nbsp;&nbsp; Wall St</div>
+                                <div class="mini-values"><span class="main">42</span><span class="wall">48</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stories -->
+        <div class="info-card" style="margin-bottom: 18px;">
+            <div class="card-hover-icons">
+                <button class="hover-icon-btn share-btn" onclick="openShareModal('Stories')" title="Share">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='18' cy='5' r='3'/%3E%3Ccircle cx='6' cy='12' r='3'/%3E%3Ccircle cx='18' cy='19' r='3'/%3E%3Cline x1='8.59' y1='13.51' x2='15.42' y2='17.49'/%3E%3Cline x1='15.41' y1='6.51' x2='8.59' y2='10.49'/%3E%3C/svg%3E"
+                         alt="Share" class="share-icon-img">
+                </button>
+                <button class="hover-icon-btn ai-btn" onclick="openAIModal('stories')" title="Explain with AI">✦</button>
+            </div>
+            <div class="section-title" style="color: var(--text-primary);">Stories</div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                <div style="background: rgba(26, 26, 36, 0.55); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; cursor: pointer;">
+                    <!-- Use seeded placeholder images so the demo always renders images reliably -->
+                    <div style="height: 110px; background-image:url('https://picsum.photos/seed/likefolio-story-1/900/300'); background-size:cover; background-position:center;"></div>
+                    <div style="padding: 12px;">
+                        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">LikeFolio • 2d ago</div>
+                        <div style="font-weight: 700; line-height: 1.35;">The “Resizing” Wave: Why Activewear Demand is Surging</div>
+                    </div>
+                </div>
+                <div style="background: rgba(26, 26, 36, 0.55); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; cursor: pointer;">
+                    <div style="height: 110px; background-image:url('https://picsum.photos/seed/likefolio-story-2/900/300'); background-size:cover; background-position:center;"></div>
+                    <div style="padding: 12px;">
+                        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Reuters • 4d ago</div>
+                        <div style="font-weight: 700; line-height: 1.35;">GLP‑1 Adoption Expands as Supply and Coverage Improve</div>
+                    </div>
+                </div>
+                <div style="background: rgba(26, 26, 36, 0.55); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; overflow: hidden; cursor: pointer;">
+                    <div style="height: 110px; background-image:url('https://picsum.photos/seed/likefolio-story-3/900/300'); background-size:cover; background-position:center;"></div>
+                    <div style="padding: 12px;">
+                        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">WSJ • 1w ago</div>
+                        <div style="font-weight: 700; line-height: 1.35;">Food Brands Adjust Product Mix as Demand Shifts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Catalysts -->
+        <div class="info-card" style="margin-bottom: 18px;">
+            <div class="card-hover-icons">
+                <button class="hover-icon-btn share-btn" onclick="openShareModal('Upcoming Catalysts')" title="Share">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='18' cy='5' r='3'/%3E%3Ccircle cx='6' cy='12' r='3'/%3E%3Ccircle cx='18' cy='19' r='3'/%3E%3Cline x1='8.59' y1='13.51' x2='15.42' y2='17.49'/%3E%3Cline x1='15.41' y1='6.51' x2='8.59' y2='10.49'/%3E%3C/svg%3E"
+                         alt="Share" class="share-icon-img">
+                </button>
+                <button class="hover-icon-btn ai-btn" onclick="openAIModal('catalysts')" title="Explain with AI">✦</button>
+            </div>
+            <div class="section-title" style="color: var(--text-primary);">Upcoming Catalysts</div>
+            <div style="display:grid; grid-template-columns: 140px 1fr; gap:10px 14px; align-items:start; font-size:14px; color: rgba(240,240,245,0.88);">
+                <div style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size:12px;">Jan 28</div>
+                <div><strong>MSFT</strong> earnings (macro read-through for consumer + enterprise spend)</div>
+                <div style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size:12px;">Jan 30</div>
+                <div><strong>AAPL</strong> earnings (consumer discretionary sensitivity + services mix)</div>
+                <div style="color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size:12px;">Feb 4–6</div>
+                <div><strong>GOOGL / META / AMZN</strong> earnings (ad demand + e‑commerce basket shifts)</div>
+                <div style="color: var(--text-muted); font-size:12px;">—</div>
+                <div style="color: var(--text-muted); font-size:12px;">demo copy--this box could be powered by ai</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="share-modal-overlay" id="shareModal" onclick="closeShareModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">Share "<span id="shareModuleName">Module</span>"</div>
+                <button class="modal-close" onclick="closeShareModal()">×</button>
+            </div>
+            <div class="modal-body">
+                Choose a destination:
+                <div class="share-actions">
+                    <div class="share-action" onclick="shareTo('X')">𝕏 &nbsp; X (Twitter)</div>
+                    <div class="share-action" onclick="shareTo('LinkedIn')">in &nbsp; LinkedIn</div>
+                    <div class="share-action" onclick="shareTo('Facebook')">f &nbsp; Facebook</div>
+                    <div class="share-action" onclick="copyLink()">🔗 &nbsp; Copy Link</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Explain Modal -->
+    <div class="ai-modal-overlay" id="aiModal" onclick="closeAIModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">AI Explanation</div>
+                <button class="modal-close" onclick="closeAIModal()">×</button>
+            </div>
+            <div class="modal-body" id="aiModalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Keep this demo page minimal: modals only (no "trend score" logic on purpose).
+        let currentShareModule = '';
+
+        function openShareModal(moduleName) {
+            currentShareModule = moduleName;
+            document.getElementById('shareModuleName').textContent = moduleName;
+            document.getElementById('shareModal').classList.add('visible');
+        }
+
+        function closeShareModal(event) {
+            if (!event || event.target === document.getElementById('shareModal')) {
+                document.getElementById('shareModal').classList.remove('visible');
+            }
+        }
+
+        function shareTo(destination) {
+            // Demo stub: in production this would open a share composer with deep link + image card.
+            alert(`Share "${currentShareModule}" to ${destination} (demo)`);
+            closeShareModal();
+        }
+
+        function copyLink() {
+            // Demo stub: copy a placeholder link
+            navigator.clipboard?.writeText(`https://likefolio.ai/trends/glp-1-economy`).catch(() => {});
+            alert('Link copied (demo)');
+            closeShareModal();
+        }
+
+        const aiExplanations = {
+            hero: `<strong>GLP-1 Economy</strong> summarizes how GLP-1 adoption is changing real-world consumer behavior.<br><br>
+                  We highlight the most impacted categories and the public companies most likely to benefit or face headwinds.`,
+            drivers: `<strong>Trend Drivers</strong> explains the “why” behind the GLP‑1 Economy.<br><br>
+                  For retail users, this section should be short, causal, and memorable—so you can understand <em>what must stay true</em> for the trend to persist.`,
+            changed: `<strong>What Changed Recently</strong> highlights the most important new signals since the last update.<br><br>
+                  Think: new inflection points in intent/spend, category substitution, and which companies are starting to see the impact first.`,
+            catalysts: `<strong>Upcoming Catalysts</strong> lists near‑term events that could move the trend narrative.<br><br>
+                  Earnings read‑throughs, policy headlines, supply/coverage updates, and trial results all belong here.`,
+            stories: `<strong>Stories</strong> is the evidence trail—LikeFolio writeups plus key external reporting that supports (or challenges) the trend.`,
+            beneficiaries: `<strong>Beneficiaries</strong> are companies seeing demand tailwinds linked to GLP-1 behavior shifts (e.g., growth in activity/fitness spend, medication leaders).`,
+            risk: `<strong>At Risk</strong> are companies whose products see reduced demand (e.g., sugary snacks, soda, impulse food categories).`,
+            q1: `We’d look for snack/impulse categories where LikeFolio consumer intent is falling fastest in high-GLP-1 demographics.`,
+            q2: `We’d compare pipeline breadth, trial progress, and consumer sentiment around access/availability to estimate share shifts.`,
+            q3: `We’d track resizing behavior and category substitution to estimate winners within apparel and footwear.`,
+            q4: `We’d correlate intent, spend, and retention signals to infer which gym models gain the most from the trend.`
+        };
+
+        function openAIModal(type) {
+            document.getElementById('aiModalContent').innerHTML = aiExplanations[type] || 'No explanation available.';
+            document.getElementById('aiModal').classList.add('visible');
+        }
+
+        function closeAIModal(event) {
+            if (!event || event.target === document.getElementById('aiModal')) {
+                document.getElementById('aiModal').classList.remove('visible');
+            }
+        }
+    </script>
+</body>
+</html>
+
