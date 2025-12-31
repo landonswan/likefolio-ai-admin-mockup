@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trends | LikeFolio.ai (Demo)</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================================
+           LikeFolio.ai Trends Directory (DEMO)
+           - Retail-facing list of all trends
+           - Client-side search/filter/sort only (no backend)
+           - Uses simple seeded images so cards always render
+           ========================================================= */
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --bg-card: #15151f;
+            --border: #2a2a3a;
+            --text-primary: #f0f0f5;
+            --text-secondary: #a0a0b0;
+            --text-muted: #606070;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-lime: #84cc16;
+            --accent-yellow: #eab308;
+            --accent-orange: #f97316;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 26px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== Header ===== */
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 18px;
+        }
+
+        .title h1 {
+            font-size: 34px;
+            letter-spacing: -0.8px;
+            line-height: 1.1;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+            max-width: 720px;
+        }
+
+        .pill-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(26, 26, 36, 0.55);
+            color: var(--text-primary);
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .pill-link:hover {
+            border-color: rgba(255,255,255,0.18);
+            background: rgba(26, 26, 36, 0.70);
+        }
+
+        /* ===== Controls ===== */
+        .controls {
+            background: rgba(18, 18, 26, 0.75);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 18px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(26, 26, 36, 0.55);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+
+        .search input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .search input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .clear-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(10,10,15,0.55);
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .clear-btn:hover {
+            color: var(--text-primary);
+            border-color: rgba(255,255,255,0.16);
+        }
+
+        .right-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .select {
+            background: rgba(26, 26, 36, 0.55);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 12px;
+            padding: 10px 12px;
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(26, 26, 36, 0.35);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .chip.active {
+            background: rgba(59, 130, 246, 0.22);
+            border-color: rgba(59, 130, 246, 0.45);
+            color: #cfe0ff;
+        }
+
+        .chip .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.25);
+        }
+
+        .chip.active .dot { background: rgba(207,224,255,0.85); }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* ===== Trend Cards ===== */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .trend-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--bg-card);
+            cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+
+        .trend-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.16);
+        }
+
+        .trend-img {
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+            background-color: rgba(26, 26, 36, 0.55);
+            filter: saturate(1.05) contrast(1.05);
+        }
+
+        .trend-body {
+            padding: 14px;
+        }
+
+        .trend-topline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            height: 22px;
+            padding: 0 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .tag.macro { background: rgba(59, 130, 246, 0.22); color: #cfe0ff; }
+        .tag.sector { background: rgba(139, 92, 246, 0.18); color: #e3d7ff; }
+        .tag.consumer { background: rgba(16, 185, 129, 0.16); color: #c9f3e6; }
+
+        .updated {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .trend-title {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            margin-bottom: 8px;
+        }
+
+        .trend-desc {
+            color: rgba(240,240,245,0.86);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            min-height: 58px; /* keeps card heights consistent in the demo */
+        }
+
+        .trend-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .mini {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(26, 26, 36, 0.35);
+            padding: 5px 8px;
+            border-radius: 999px;
+        }
+
+        .trend-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .counts {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .open-btn {
+            padding: 8px 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(26, 26, 36, 0.55);
+            color: var(--text-primary);
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .trend-card:hover .open-btn {
+            border-color: rgba(255,255,255,0.18);
+            background: rgba(26, 26, 36, 0.70);
+        }
+
+        /* ===== "Top impacted assets" row (like screenshot) ===== */
+        .impacted {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 12px;
+            margin-top: 10px;
+        }
+
+        .impacted-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .impacted-tickers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .ticker-chip {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            padding: 5px 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            background: rgba(16, 185, 129, 0.12);
+            color: #bff6e6;
+        }
+
+        .ticker-chip.negative {
+            border-color: rgba(239, 68, 68, 0.35);
+            background: rgba(239, 68, 68, 0.12);
+            color: #ffd1d1;
+        }
+
+        .ticker-chip.more {
+            border-color: rgba(255,255,255,0.12);
+            background: rgba(26, 26, 36, 0.55);
+            color: var(--text-secondary);
+            font-weight: 900;
+        }
+
+        /* ===== Hover icons (share + AI) ===== */
+        .card-hover-icons {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .trend-card:hover .card-hover-icons {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .hover-icon-btn {
+            width: 32px;
+            height: 32px;
+            background: rgba(26, 26, 36, 0.95);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #a0a0b0;
+        }
+
+        .hover-icon-btn:hover {
+            background: rgba(42, 42, 58, 1);
+            border-color: #606070;
+            color: #ffffff;
+        }
+
+        .share-icon-img {
+            width: 18px;
+            height: 18px;
+            filter: invert(70%) sepia(0%) saturate(0%) brightness(100%);
+            transition: filter 0.2s;
+        }
+
+        .hover-icon-btn.share-btn:hover .share-icon-img {
+            filter: invert(100%) sepia(0%) saturate(0%) brightness(100%);
+        }
+
+        .hover-icon-btn.ai-btn {
+            filter: grayscale(100%);
+            opacity: 0.85;
+            font-size: 16px;
+        }
+
+        .hover-icon-btn.ai-btn:hover {
+            filter: none;
+            opacity: 1;
+        }
+
+        /* ===== Modals (same behavior as other demos) ===== */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .overlay.visible { display: flex; }
+
+        .modal {
+            width: min(560px, 100%);
+            background: rgba(18, 18, 26, 0.98);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .modal-title { font-weight: 800; }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(26, 26, 36, 0.8);
+            border: 1px solid rgba(255,255,255,0.10);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .modal-close:hover { border-color: rgba(255,255,255,0.18); }
+
+        .modal-body {
+            padding: 16px;
+            color: rgba(240,240,245,0.88);
+            line-height: 1.55;
+            font-size: 14px;
+        }
+
+        .share-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .share-action {
+            padding: 12px 12px;
+            border-radius: 12px;
+            background: rgba(26, 26, 36, 0.7);
+            border: 1px solid rgba(255,255,255,0.10);
+            cursor: pointer;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            font-weight: 800;
+        }
+
+        .share-action:hover { border-color: rgba(255,255,255,0.16); }
+
+        @media (max-width: 1020px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+            .controls { grid-template-columns: 1fr; }
+            .right-controls { justify-content: space-between; }
+        }
+
+        @media (max-width: 640px) {
+            .grid { grid-template-columns: 1fr; }
+            .top { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="container">
+        <div class="top">
+            <div class="title">
+                <h1>Trends</h1>
+                <div class="subtitle">
+                    Browse LikeFolio trends and themes. Search by name/tickers, filter by type, and sort by freshness.
+                    (Demo UI — content is simulated.)
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div>
+                <div class="search">
+                    <span style="color: var(--text-muted); font-weight: 800;">⌕</span>
+                    <input id="searchInput" type="text" placeholder="Search trends (e.g., GLP‑1, 'AI', LLY, DECK, soda…)">
+                    <button class="clear-btn" id="clearBtn" title="Clear">×</button>
+                </div>
+                <div class="meta-row">
+                    <div id="resultsMeta">0 results</div>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span>Sort:</span>
+                        <select id="sortSelect" class="select" title="Sort">
+                            <option value="name_asc">Name (A→Z)</option>
+                            <option value="name_desc">Name (Z→A)</option>
+                            <option value="updated_desc">Newest</option>
+                            <option value="updated_asc">Oldest</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="right-controls">
+                <button class="select" id="resetBtn" title="Reset filters">Reset</button>
+            </div>
+        </div>
+
+        <div class="grid" id="trendGrid"></div>
+
+        <div style="margin-top:16px; color: var(--text-muted); font-size: 12px;">
+            Tip: Click a card to open the trend. In production this list would be powered by a backend + real-time updates.
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="overlay" id="shareModal" onclick="closeShareModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">Share "<span id="shareModuleName">Trend</span>"</div>
+                <button class="modal-close" onclick="closeShareModal()">×</button>
+            </div>
+            <div class="modal-body">
+                Choose a destination:
+                <div class="share-actions">
+                    <div class="share-action" onclick="shareTo('X')">𝕏 &nbsp; X (Twitter)</div>
+                    <div class="share-action" onclick="shareTo('LinkedIn')">in &nbsp; LinkedIn</div>
+                    <div class="share-action" onclick="shareTo('Facebook')">f &nbsp; Facebook</div>
+                    <div class="share-action" onclick="copyLink()">🔗 &nbsp; Copy Link</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Explain Modal -->
+    <div class="overlay" id="aiModal" onclick="closeAIModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">AI Explanation</div>
+                <button class="modal-close" onclick="closeAIModal()">×</button>
+            </div>
+            <div class="modal-body" id="aiModalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================================
+           DATA (demo)
+           - Keep a single source of truth in an array.
+           - "type" maps to filter chips and visual tag.
+           - "keywords" boosts search by adding common user terms.
+           ========================================================= */
+
+        const TRENDS = [
+            {
+                id: "glp1",
+                title: "GLP‑1 Economy",
+                type: "macro",
+                updated: "2025-12-16",
+                description: "Early signs of reduced snack + soda demand; activewear sees a “resizing” boom.",
+                tags: ["Health", "Consumer", "Medication"],
+                beneficiaries: ["LLY", "NVO", "DECK", "ONON", "LULU"],
+                atRisk: ["PEP", "KO", "MCD", "HSY", "GIS"],
+                link: "trend_view.html",
+                imageSeed: "glp1",
+                keywords: ["weight loss", "ozempic", "wegovy", "zepbound", "nutrition", "protein"]
+            },
+            {
+                id: "ai-hardware-cycle",
+                title: "AI Hardware Cycle",
+                type: "sector",
+                updated: "2025-12-10",
+                description: "Compute demand drives capex; watch supply constraints and pricing power across the stack.",
+                tags: ["AI", "Semis", "Cloud"],
+                beneficiaries: ["NVDA", "AVGO", "SMCI"],
+                atRisk: ["INTC"],
+                link: "aapl_stock_view.html",
+                imageSeed: "ai-hardware",
+                keywords: ["gpu", "datacenter", "capex", "inference", "training"]
+            },
+            {
+                id: "premium-consumer",
+                title: "Premium Consumer Resilience",
+                type: "consumer",
+                updated: "2025-12-05",
+                description: "High‑income cohorts keep spending; mass market shows softness. Mixed signals by category.",
+                tags: ["Retail", "Luxury"],
+                beneficiaries: ["LULU", "ELF"],
+                atRisk: ["TGT"],
+                link: "trend_view.html",
+                imageSeed: "premium-consumer",
+                keywords: ["luxury", "high income", "asp", "pricing power"]
+            },
+            {
+                id: "china-exposure",
+                title: "China Exposure",
+                type: "macro",
+                updated: "2025-11-28",
+                description: "Geopolitics + local competition drive volatility for brands with large China revenue share.",
+                tags: ["China", "Geopolitics"],
+                beneficiaries: [],
+                atRisk: ["AAPL", "NKE"],
+                link: "aapl_stock_view.html",
+                imageSeed: "china",
+                keywords: ["tariffs", "huawei", "local brands", "policy"]
+            },
+            {
+                id: "energy-transition",
+                title: "Energy Transition Catch‑Up",
+                type: "sector",
+                updated: "2025-11-20",
+                description: "Grid buildout + efficiency upgrades accelerate; adoption uneven across regions.",
+                tags: ["Energy", "Infrastructure"],
+                beneficiaries: ["ETN"],
+                atRisk: [],
+                link: "trend_view.html",
+                imageSeed: "energy",
+                keywords: ["grid", "hvac", "electrification"]
+            }
+        ];
+
+        /* =========================================================
+           STATE
+           - filterType: (removed from UI for now; kept for easy re-introduction later)
+           - searchText: free text
+           - sortMode: see <select>
+           ========================================================= */
+
+        let filterType = "all";
+        let searchText = "";
+        let sortMode = "updated_desc";
+        let currentShareName = "";
+        let currentShareLink = "";
+
+        /* =========================================================
+           UTIL
+           ========================================================= */
+
+        function parseDateISO(iso) {
+            // iso expected "YYYY-MM-DD"
+            const [y, m, d] = iso.split("-").map(Number);
+            return new Date(y, (m || 1) - 1, d || 1);
+        }
+
+        function formatUpdated(iso) {
+            // Retail-friendly: "Updated Dec 16"
+            const dt = parseDateISO(iso);
+            const month = dt.toLocaleString(undefined, { month: "short" });
+            return `Updated ${month} ${dt.getDate()}`;
+        }
+
+        function includesSearch(trend, qLower) {
+            // Search across title, tags, tickers, and keywords.
+            const blob = [
+                trend.title,
+                trend.description,
+                ...(trend.tags || []),
+                ...(trend.beneficiaries || []),
+                ...(trend.atRisk || []),
+                ...(trend.keywords || [])
+            ].join(" ").toLowerCase();
+            return blob.includes(qLower);
+        }
+
+        function sortTrends(list) {
+            const copy = [...list];
+            copy.sort((a, b) => {
+                if (sortMode === "updated_desc") return parseDateISO(b.updated) - parseDateISO(a.updated);
+                if (sortMode === "updated_asc") return parseDateISO(a.updated) - parseDateISO(b.updated);
+                if (sortMode === "name_asc") return a.title.localeCompare(b.title);
+                if (sortMode === "name_desc") return b.title.localeCompare(a.title);
+                return 0;
+            });
+            return copy;
+        }
+
+        /* =========================================================
+           RENDER
+           ========================================================= */
+
+        function render() {
+            const q = searchText.trim().toLowerCase();
+
+            // Filter chips removed in this iteration (retail UI simplification).
+            // Keep the variable for easy re-introduction later; for now, show all.
+            let list = TRENDS;
+            if (q) list = list.filter(t => includesSearch(t, q));
+            list = sortTrends(list);
+
+            document.getElementById("resultsMeta").textContent = `${list.length} result${list.length === 1 ? "" : "s"}`;
+
+            const grid = document.getElementById("trendGrid");
+            if (!list.length) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; padding: 18px; border: 1px dashed rgba(255,255,255,0.14); border-radius: 16px; color: var(--text-secondary);">
+                        No trends match your filters. Try clearing search or selecting “All”.
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = list.map(t => {
+                // Mark "impacted assets" as green (beneficiaries) or red (at risk)
+                const impactedLabeled = [
+                    ...(t.beneficiaries || []).map(sym => ({ sym, sentiment: "positive" })),
+                    ...(t.atRisk || []).map(sym => ({ sym, sentiment: "negative" }))
+                ].filter(x => x.sym);
+
+                // Prefer showing a mix: beneficiaries first, then at-risk, up to 3 total.
+                const topImpacted = impactedLabeled.slice(0, 3);
+                const remaining = Math.max(0, impactedLabeled.length - topImpacted.length);
+                const img = `https://picsum.photos/seed/likefolio-${encodeURIComponent(t.imageSeed || t.id)}/900/400`;
+
+                // NOTE: We intentionally keep these inline for the demo to avoid a build step.
+                return `
+                    <div class="trend-card" role="button" tabindex="0"
+                         data-link="${t.link}"
+                         onclick="openTrend('${t.link}')"
+                         onkeydown="if(event.key==='Enter'){openTrend('${t.link}')}">
+                        <div class="card-hover-icons">
+                            <button class="hover-icon-btn share-btn" title="Share"
+                                    onclick="event.stopPropagation(); openShareModal('${escapeHtml(t.title)}','${t.link}')">
+                                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Ccircle cx='18' cy='5' r='3'/%3E%3Ccircle cx='6' cy='12' r='3'/%3E%3Ccircle cx='18' cy='19' r='3'/%3E%3Cline x1='8.59' y1='13.51' x2='15.42' y2='17.49'/%3E%3Cline x1='15.41' y1='6.51' x2='8.59' y2='10.49'/%3E%3C/svg%3E"
+                                     alt="Share" class="share-icon-img">
+                            </button>
+                            <button class="hover-icon-btn ai-btn" title="Explain with AI"
+                                    onclick="event.stopPropagation(); openAIModal('${t.id}')">✦</button>
+                        </div>
+                        <div class="trend-img" style="background-image: url('${img}');"></div>
+                        <div class="trend-body">
+                            <div class="trend-topline">
+                                <span style="font-size:12px; color: var(--text-muted); font-weight: 700;">&nbsp;</span>
+                            </div>
+                            <div class="trend-title">${escapeHtml(t.title)}</div>
+                            <div class="trend-desc">${escapeHtml(t.description)}</div>
+                            <div class="impacted">
+                                <div class="impacted-label">Top impacted assets</div>
+                                <div class="impacted-tickers">
+                                    ${topImpacted.map(x => `<span class="ticker-chip ${x.sentiment === "negative" ? "negative" : ""}">${escapeHtml(x.sym)}</span>`).join("")}
+                                    ${remaining > 0 ? `<span class="ticker-chip more">+${remaining}</span>` : ``}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        /* =========================================================
+           EVENTS
+           ========================================================= */
+
+        function resetAll() {
+            searchText = "";
+            sortMode = "name_asc";
+            document.getElementById("searchInput").value = "";
+            document.getElementById("sortSelect").value = sortMode;
+            render();
+        }
+
+        function openTrend(link) {
+            // Demo: simple navigation to local html file (works on GitHub Pages).
+            window.location.href = link;
+        }
+
+        function escapeHtml(str) {
+            // Minimal HTML escaping for user-visible strings in this demo.
+            return String(str)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        /* =========================================================
+           MODALS
+           ========================================================= */
+
+        function openShareModal(name, link) {
+            currentShareName = name;
+            currentShareLink = link;
+            document.getElementById("shareModuleName").textContent = name;
+            document.getElementById("shareModal").classList.add("visible");
+        }
+
+        function closeShareModal(event) {
+            if (!event || event.target === document.getElementById("shareModal")) {
+                document.getElementById("shareModal").classList.remove("visible");
+            }
+        }
+
+        function shareTo(destination) {
+            // Demo stub: in production this would open a share composer with deep link + image card.
+            alert(`Share "${currentShareName}" to ${destination} (demo)\nLink: ${currentShareLink}`);
+            closeShareModal();
+        }
+
+        function copyLink() {
+            // Demo stub: copy a relative link. (On GitHub Pages this becomes a public URL.)
+            navigator.clipboard?.writeText(currentShareLink).catch(() => {});
+            alert("Link copied (demo)");
+            closeShareModal();
+        }
+
+        const aiExplanations = {
+            glp1: `<strong>GLP‑1 Economy</strong><br><br>
+                   This trend tracks how GLP‑1 adoption changes consumer purchase intent across categories.
+                   In production, this summary would be generated from LikeFolio signals + recent catalysts.`,
+            "ai-hardware-cycle": `<strong>AI Hardware Cycle</strong><br><br>
+                   Tracks demand for compute and downstream read-throughs (cloud capex, networking, cooling).
+                   Useful for spotting when consumer/enterprise demand diverges from Wall Street narratives.`,
+            "premium-consumer": `<strong>Premium Consumer Resilience</strong><br><br>
+                   Highlights spending strength in higher‑income cohorts even when mass market softens.
+                   Great for identifying which brands have pricing power.`,
+            "china-exposure": `<strong>China Exposure</strong><br><br>
+                   Captures geopolitical + competitive pressures impacting brands with large China revenue share.
+                   Watch for sentiment swings and earnings guidance changes.`,
+            "energy-transition": `<strong>Energy Transition Catch‑Up</strong><br><br>
+                   Tracks grid and infrastructure upgrade demand (electrification, efficiency, buildout).
+                   Often plays out in multi‑quarter cycles.`
+        };
+
+        function openAIModal(trendId) {
+            document.getElementById("aiModalContent").innerHTML = aiExplanations[trendId] || "No explanation available (demo).";
+            document.getElementById("aiModal").classList.add("visible");
+        }
+
+        function closeAIModal(event) {
+            if (!event || event.target === document.getElementById("aiModal")) {
+                document.getElementById("aiModal").classList.remove("visible");
+            }
+        }
+
+        /* =========================================================
+           INIT
+           ========================================================= */
+
+        document.getElementById("searchInput").addEventListener("input", (e) => {
+            searchText = e.target.value || "";
+            render();
+        });
+
+        document.getElementById("clearBtn").addEventListener("click", () => {
+            searchText = "";
+            document.getElementById("searchInput").value = "";
+            render();
+        });
+
+        document.getElementById("sortSelect").addEventListener("change", (e) => {
+            sortMode = e.target.value;
+            render();
+        });
+
+        document.getElementById("resetBtn").addEventListener("click", resetAll);
+
+        // First render
+        sortMode = document.getElementById("sortSelect").value;
+        render();
+    </script>
+</body>
+</html>
+
+
